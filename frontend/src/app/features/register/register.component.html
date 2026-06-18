@@ -1,0 +1,276 @@
+<!-- Header Nav -->
+<header class="header">
+  <div class="container header-container">
+    <div class="logo">
+      <a routerLink="/"><span class="logo-accent">GOD OF</span> Mobiles</a>
+    </div>
+    <nav class="nav">
+      <a routerLink="/" class="nav-link">{{ ts.t('home') }}</a>
+      <a routerLink="/register" class="nav-link active">{{ ts.t('register') }}</a>
+      
+      <div class="lang-switch">
+        <button 
+          (click)="ts.setLanguage('en')" 
+          [class.active]="ts.currentLang() === 'en'" 
+          class="lang-btn">
+          EN
+        </button>
+        <span class="divider">|</span>
+        <button 
+          (click)="ts.setLanguage('ta')" 
+          [class.active]="ts.currentLang() === 'ta'" 
+          class="lang-btn">
+          தமிழ்
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="container form-container grid register-grid animate-fade-in">
+    
+    <!-- Left Column: Tech Scanner Animation Console -->
+    <div class="tech-scanner-console">
+      <div class="console-border-decor"></div>
+      <div class="console-header">
+        <span class="status-dot pulsing"></span>
+        <span class="console-title">IMEI COORDINATES SCANNER</span>
+      </div>
+      
+      <!-- High-Tech Radar Display -->
+      <div class="radar-display">
+        <div class="radar-sweep"></div>
+        <div class="radar-grid"></div>
+        <div class="radar-circle circle-1"></div>
+        <div class="radar-circle circle-2"></div>
+        <div class="radar-circle circle-3"></div>
+        <div class="radar-blip"></div>
+        <div class="radar-blip blip-2"></div>
+        <div class="radar-crosshair"></div>
+      </div>
+      
+      <!-- High-Tech Metrics Feed -->
+      <div class="console-metrics">
+        <div class="metric-row">
+          <span class="metric-label">SYS_STATUS:</span>
+          <span class="metric-val text-success">SCANNING_CELL_TOWERS</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">TELEMETRY:</span>
+          <span class="metric-val text-blue">IMEI_SWEEP_RUNNING</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">SYS_LATENCY:</span>
+          <span class="metric-val font-mono">14ms</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">LAST_COORDS:</span>
+          <span class="metric-val text-gold font-mono">13.0827° N, 80.2707° E</span>
+        </div>
+      </div>
+      <div class="console-footer-decor">
+        <span class="decor-line"></span>
+        <span class="decor-text">SECURE LEAD GATEWAY</span>
+      </div>
+    </div>
+    
+    <!-- Right Column: Registration Card -->
+    <div class="form-card">
+      <h1 class="form-title">{{ ts.t('form_title') }}</h1>
+      <p class="form-subtitle">{{ ts.t('form_desc') }}</p>
+      
+      <!-- Error messages from server -->
+      <div class="alert alert-danger" *ngIf="serverMessage">
+        <span class="material-icons">error</span>
+        <p>{{ serverMessage }}</p>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="registration-form">
+        
+        <!-- Section 1: Personal Info -->
+        <div class="form-section">
+          <h2 class="section-heading"><span class="material-icons section-icon">person</span>{{ ts.t('personal_info') }}</h2>
+          <div class="form-grid">
+            
+            <!-- Name -->
+            <div class="form-group" [class.has-error]="isInvalid('name') || serverErrors['name']">
+              <label for="name">{{ ts.t('name') }} <span class="required">*</span></label>
+              <input type="text" id="name" formControlName="name" placeholder="e.g. Ramesh Kumar">
+              <span class="error-msg" *ngIf="isInvalid('name')">{{ ts.t('val_required') }}</span>
+              <span class="error-msg" *ngIf="serverErrors['name']">{{ serverErrors['name'] }}</span>
+            </div>
+            
+            <!-- Mobile Number -->
+            <div class="form-group" [class.has-error]="isInvalid('mobile_number') || serverErrors['mobile_number']">
+              <label for="mobile_number">{{ ts.t('mobile_number') }} <span class="required">*</span></label>
+              <input type="tel" id="mobile_number" formControlName="mobile_number" placeholder="e.g. 9876543210" maxlength="10">
+              <span class="error-msg" *ngIf="isInvalid('mobile_number')">{{ ts.t('val_mobile_len') }}</span>
+              <span class="error-msg" *ngIf="serverErrors['mobile_number']">{{ serverErrors['mobile_number'] }}</span>
+            </div>
+
+            <!-- Alternate Mobile -->
+            <div class="form-group" [class.has-error]="isInvalid('alternative_mobile_number') || serverErrors['alternative_mobile_number']">
+              <label for="alternative_mobile_number">{{ ts.t('alt_mobile') }}</label>
+              <input type="tel" id="alternative_mobile_number" formControlName="alternative_mobile_number" placeholder="e.g. 9876543211" maxlength="10">
+              <span class="error-msg" *ngIf="isInvalid('alternative_mobile_number')">{{ ts.t('val_mobile_len') }}</span>
+              <span class="error-msg" *ngIf="serverErrors['alternative_mobile_number']">{{ serverErrors['alternative_mobile_number'] }}</span>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group" [class.has-error]="isInvalid('email') || serverErrors['email']">
+              <label for="email">{{ ts.t('email') }}</label>
+              <input type="email" id="email" formControlName="email" placeholder="e.g. ramesh@example.com">
+              <span class="error-msg" *ngIf="isInvalid('email')">{{ ts.t('val_email') }}</span>
+              <span class="error-msg" *ngIf="serverErrors['email']">{{ serverErrors['email'] }}</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 2: Device Information -->
+        <div class="form-section">
+          <h2 class="section-heading"><span class="material-icons section-icon">phone_android</span>{{ ts.t('device_info') }}</h2>
+          
+          <div class="form-grid">
+            <!-- IMEI 1 -->
+            <div class="form-group" [class.has-error]="isInvalid('imei_1') || serverErrors['imei_1']">
+              <label for="imei_1">{{ ts.t('imei_1') }} <span class="required">*</span></label>
+              <input type="text" id="imei_1" formControlName="imei_1" placeholder="15-digit IMEI number" maxlength="15">
+              <span class="error-msg" *ngIf="isInvalid('imei_1')">{{ ts.t('val_imei_len') }}</span>
+              <span class="error-msg" *ngIf="serverErrors['imei_1']">{{ serverErrors['imei_1'] }}</span>
+            </div>
+
+            <!-- IMEI 2 -->
+            <div class="form-group" [class.has-error]="isInvalid('imei_2') || serverErrors['imei_2']">
+              <label for="imei_2">{{ ts.t('imei_2') }}</label>
+              <input type="text" id="imei_2" formControlName="imei_2" placeholder="Optional 15-digit IMEI 2" maxlength="15">
+              <span class="error-msg" *ngIf="isInvalid('imei_2')">{{ ts.t('val_imei_len') }}</span>
+              <span class="error-msg" *ngIf="serverErrors['imei_2']">{{ serverErrors['imei_2'] }}</span>
+            </div>
+
+            <!-- Mobile Brand -->
+            <div class="form-group" [class.has-error]="isInvalid('mobile_brand') || serverErrors['mobile_brand']">
+              <label for="mobile_brand">{{ ts.t('brand_select') }} <span class="required">*</span></label>
+              <select id="mobile_brand" formControlName="mobile_brand">
+                <option value="" disabled selected>Select Brand</option>
+                <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
+              </select>
+              <span class="error-msg" *ngIf="isInvalid('mobile_brand')">{{ ts.t('val_required') }}</span>
+              <span class="error-msg" *ngIf="serverErrors['mobile_brand']">{{ serverErrors['mobile_brand'] }}</span>
+            </div>
+
+            <!-- Mobile Model -->
+            <div class="form-group" [class.has-error]="isInvalid('mobile_model') || serverErrors['mobile_model']">
+              <label for="mobile_model">{{ ts.t('model') }} <span class="required">*</span></label>
+              <input type="text" id="mobile_model" formControlName="mobile_model" placeholder="e.g. Galaxy S24 Ultra">
+              <span class="error-msg" *ngIf="isInvalid('mobile_model')">{{ ts.t('val_required') }}</span>
+              <span class="error-msg" *ngIf="serverErrors['mobile_model']">{{ serverErrors['mobile_model'] }}</span>
+            </div>
+
+            <!-- Missing Date -->
+            <div class="form-group" [class.has-error]="isInvalid('missing_date') || serverErrors['missing_date']">
+              <label for="missing_date">{{ ts.t('missing_date') }} <span class="required">*</span></label>
+              <input type="date" id="missing_date" formControlName="missing_date">
+              <span class="error-msg" *ngIf="isInvalid('missing_date')">{{ ts.t('val_required') }}</span>
+              <span class="error-msg" *ngIf="serverErrors['missing_date']">{{ serverErrors['missing_date'] }}</span>
+            </div>
+
+            <!-- Police Complaint No -->
+            <div class="form-group" [class.has-error]="isInvalid('police_complaint_no') || serverErrors['police_complaint_no']">
+              <label for="police_complaint_no">{{ ts.t('police_no') }}</label>
+              <input type="text" id="police_complaint_no" formControlName="police_complaint_no" placeholder="e.g. CSR-12345/2026">
+              <span class="error-msg" *ngIf="serverErrors['police_complaint_no']">{{ serverErrors['police_complaint_no'] }}</span>
+            </div>
+          </div>
+
+          <!-- Missing Location -->
+          <div class="form-group full-width-field" [class.has-error]="isInvalid('missing_location') || serverErrors['missing_location']">
+            <label for="missing_location">{{ ts.t('missing_loc') }} <span class="required">*</span></label>
+            <input type="text" id="missing_location" formControlName="missing_location" placeholder="e.g. T Nagar Bus Terminus, Chennai">
+            <span class="error-msg" *ngIf="isInvalid('missing_location')">{{ ts.t('val_required') }}</span>
+            <span class="error-msg" *ngIf="serverErrors['missing_location']">{{ serverErrors['missing_location'] }}</span>
+          </div>
+
+          <!-- Incident Description -->
+          <div class="form-group full-width-field">
+            <label for="incident_description">{{ ts.t('incident_desc') }} / <span class="ta-label">{{ ts.t('incident_desc_ta') }}</span></label>
+            <textarea id="incident_description" formControlName="incident_description" rows="4" placeholder="Detail how, when, and where the device was lost..."></textarea>
+          </div>
+        </div>
+
+        <!-- Section 3: Upload Documents -->
+        <div class="form-section">
+          <h2 class="section-heading"><span class="material-icons section-icon">file_upload</span>{{ ts.t('upload_docs') }}</h2>
+          <div class="upload-grid">
+            
+            <!-- Upload Invoice -->
+            <div class="upload-box" [class.has-file]="invoiceFile" [class.has-error]="isInvalid('invoice_file') || serverErrors['invoice_file']">
+              <div class="upload-box-content">
+                <span class="material-icons upload-icon">{{ invoiceFile ? 'check_circle' : 'receipt_long' }}</span>
+                <p class="upload-label">{{ ts.t('upload_invoice') }} <span class="required">*</span></p>
+                <p class="filename" *ngIf="invoiceFile">{{ invoiceFile.name }} ({{ (invoiceFile.size / 1024 / 1024) | number:'1.1-2' }} MB)</p>
+                <button type="button" class="btn-upload" (click)="invoiceInput.click()">{{ invoiceFile ? 'Change File' : 'Browse File' }}</button>
+                <input type="file" #invoiceInput (change)="onFileSelected($event, 'invoice_file')" accept=".pdf,image/png,image/jpeg,image/jpg" style="display: none;">
+              </div>
+              <span class="error-msg text-center" *ngIf="isInvalid('invoice_file')">{{ ts.t('val_file_req') }}</span>
+              <span class="error-msg text-center" *ngIf="serverErrors['invoice_file']">{{ serverErrors['invoice_file'] }}</span>
+            </div>
+
+            <!-- Upload Photos -->
+            <div class="upload-box" [class.has-file]="mobilePhoto" [class.has-error]="serverErrors['mobile_photo']">
+              <div class="upload-box-content">
+                <span class="material-icons upload-icon">{{ mobilePhoto ? 'check_circle' : 'add_a_photo' }}</span>
+                <p class="upload-label">{{ ts.t('upload_photos') }}</p>
+                <p class="filename" *ngIf="mobilePhoto">{{ mobilePhoto.name }} ({{ (mobilePhoto.size / 1024 / 1024) | number:'1.1-2' }} MB)</p>
+                <button type="button" class="btn-upload" (click)="photoInput.click()">{{ mobilePhoto ? 'Change File' : 'Browse File' }}</button>
+                <input type="file" #photoInput (change)="onFileSelected($event, 'mobile_photo')" accept="image/png,image/jpeg,image/jpg" style="display: none;">
+              </div>
+              <span class="error-msg text-center" *ngIf="serverErrors['mobile_photo']">{{ serverErrors['mobile_photo'] }}</span>
+            </div>
+
+            <!-- Upload FIR -->
+            <div class="upload-box" [class.has-file]="firCopy" [class.has-error]="serverErrors['fir_file']">
+              <div class="upload-box-content">
+                <span class="material-icons upload-icon">{{ firCopy ? 'check_circle' : 'description' }}</span>
+                <p class="upload-label">{{ ts.t('upload_fir') }}</p>
+                <p class="filename" *ngIf="firCopy">{{ firCopy.name }} ({{ (firCopy.size / 1024 / 1024) | number:'1.1-2' }} MB)</p>
+                <button type="button" class="btn-upload" (click)="firInput.click()">{{ firCopy ? 'Change File' : 'Browse File' }}</button>
+                <input type="file" #firInput (change)="onFileSelected($event, 'fir_file')" accept=".pdf,image/png,image/jpeg,image/jpg" style="display: none;">
+              </div>
+              <span class="error-msg text-center" *ngIf="serverErrors['fir_file']">{{ serverErrors['fir_file'] }}</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 4: Consent Checkbox -->
+        <div class="consent-section" [class.has-error]="isInvalid('consent')">
+          <label class="checkbox-container">
+            <input type="checkbox" formControlName="consent">
+            <span class="checkmark"></span>
+            <span class="consent-text">
+              {{ ts.t('consent_text') }}
+            </span>
+          </label>
+          <span class="error-msg" *ngIf="isInvalid('consent')">{{ ts.t('val_consent') }}</span>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions text-center">
+          <button type="submit" class="btn btn-primary btn-lg btn-block" [disabled]="isSubmitting">
+            <span class="material-icons" *ngIf="!isSubmitting">how_to_reg</span>
+            <span class="spinner" *ngIf="isSubmitting"></span>
+            {{ isSubmitting ? 'Registering...' : ts.t('btn_submit') }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer-simple text-center">
+  <p>&copy; 2026 GOD OF Mobiles. Secure Lead Registration Panel.</p>
+</footer>

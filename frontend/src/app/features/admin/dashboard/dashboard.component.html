@@ -1,0 +1,430 @@
+<!-- Admin Dashboard Header -->
+<header class="admin-header">
+  <div class="container admin-nav d-flex justify-between align-center">
+    <div class="admin-logo">
+      <span class="badge-admin">Admin</span> GOD OF Mobiles
+    </div>
+    <div class="admin-actions d-flex align-center gap-2">
+      <button class="btn-icon" (click)="openSettings()" title="Settings">
+        <span class="material-icons">settings</span>
+      </button>
+      <button class="btn btn-outline btn-sm" (click)="logout()">
+        <span class="material-icons logout-icon">logout</span> Sign Out
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="admin-main">
+  <div class="container-fluid dashboard-container">
+    
+    <!-- KPI Panel Section -->
+    <section class="kpi-section grid gap-3 animate-fade-in">
+      
+      <!-- Total -->
+      <div class="kpi-card total">
+        <div class="kpi-icon-box"><span class="material-icons">grid_view</span></div>
+        <div class="kpi-info">
+          <h3>{{ stats().totalRegistrations | number }}</h3>
+          <p>Total Registrations</p>
+        </div>
+      </div>
+
+      <!-- Today -->
+      <div class="kpi-card today">
+        <div class="kpi-icon-box"><span class="material-icons">event</span></div>
+        <div class="kpi-info">
+          <h3>{{ stats().todayRegistrations | number }}</h3>
+          <p>Today's Registrations</p>
+        </div>
+      </div>
+
+      <!-- Pending -->
+      <div class="kpi-card pending">
+        <div class="kpi-icon-box"><span class="material-icons">pending_actions</span></div>
+        <div class="kpi-info">
+          <h3>{{ stats().pendingCases | number }}</h3>
+          <p>Pending Cases</p>
+        </div>
+      </div>
+
+      <!-- Under Review -->
+      <div class="kpi-card review">
+        <div class="kpi-icon-box"><span class="material-icons">rate_review</span></div>
+        <div class="kpi-info">
+          <h3>{{ stats().underReviewCases | number }}</h3>
+          <p>Under Review</p>
+        </div>
+      </div>
+
+      <!-- In Progress -->
+      <div class="kpi-card progress">
+        <div class="kpi-icon-box"><span class="material-icons">run_circle</span></div>
+        <div class="kpi-info">
+          <h3>{{ stats().recoveryInProgress | number }}</h3>
+          <p>Recovery In Progress</p>
+        </div>
+      </div>
+
+      <!-- Recovered -->
+      <div class="kpi-card recovered">
+        <div class="kpi-icon-box"><span class="material-icons">task_alt</span></div>
+        <div class="kpi-info">
+          <h3>{{ stats().recoveredCases | number }}</h3>
+          <p>Recovered Devices</p>
+        </div>
+      </div>
+
+      <!-- Closed -->
+      <div class="kpi-card closed">
+        <div class="kpi-icon-box"><span class="material-icons">cancel_presentation</span></div>
+        <div class="kpi-info">
+          <h3>{{ stats().closedCases | number }}</h3>
+          <p>Closed Cases</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Filters and Searches Controls -->
+    <section class="controls-section card animate-fade-in">
+      <div class="filters-grid grid gap-3">
+        
+        <!-- Search -->
+        <div class="control-group">
+          <label for="search">Search</label>
+          <div class="search-box">
+            <span class="material-icons search-icon">search</span>
+            <input 
+              type="text" 
+              id="search" 
+              [(ngModel)]="search" 
+              placeholder="Search Name, Phone, IMEI, Model..." 
+              (keyup.enter)="onApplyFilters()">
+          </div>
+        </div>
+
+        <!-- Brand Filter -->
+        <div class="control-group">
+          <label for="brand">Brand</label>
+          <select id="brand" [(ngModel)]="brandFilter" (change)="onApplyFilters()">
+            <option value="">All Brands</option>
+            <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="control-group">
+          <label for="status">Status</label>
+          <select id="status" [(ngModel)]="statusFilter" (change)="onApplyFilters()">
+            <option value="">All Statuses</option>
+            <option *ngFor="let stat of statuses" [value]="stat">{{ stat }}</option>
+          </select>
+        </div>
+
+        <!-- Start Date -->
+        <div class="control-group">
+          <label for="startDate">Missing From Date</label>
+          <input type="date" id="startDate" [(ngModel)]="startDate" (change)="onApplyFilters()">
+        </div>
+
+        <!-- End Date -->
+        <div class="control-group">
+          <label for="endDate">Missing To Date</label>
+          <input type="date" id="endDate" [(ngModel)]="endDate" (change)="onApplyFilters()">
+        </div>
+
+      </div>
+
+      <div class="controls-actions d-flex justify-between align-center">
+        <div class="filter-btns d-flex gap-2">
+          <button class="btn btn-primary btn-sm" (click)="onApplyFilters()">
+            <span class="material-icons">filter_alt</span> Apply Filters
+          </button>
+          <button class="btn btn-outline btn-sm" (click)="onClearFilters()">
+            <span class="material-icons">restart_alt</span> Clear Filters
+          </button>
+        </div>
+        
+        <div class="export-btns d-flex gap-2">
+          <button class="btn btn-secondary btn-sm" (click)="exportExcel()">
+            <span class="material-icons">table_view</span> Export XLSX
+          </button>
+          <button class="btn btn-secondary btn-sm" (click)="exportCSV()">
+            <span class="material-icons">download</span> Export CSV
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Table Data Grid -->
+    <section class="table-section card animate-fade-in">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th (click)="onSort('id')" [class.sorted]="sortField === 'id'">
+                ID <span class="material-icons sort-arrow">{{ sortField === 'id' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+              </th>
+              <th (click)="onSort('name')" [class.sorted]="sortField === 'name'">
+                Name <span class="material-icons sort-arrow">{{ sortField === 'name' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+              </th>
+              <th (click)="onSort('mobile_number')" [class.sorted]="sortField === 'mobile_number'">
+                Mobile <span class="material-icons sort-arrow">{{ sortField === 'mobile_number' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+              </th>
+              <th>Alternative Mobile</th>
+              <th (click)="onSort('imei_1')" [class.sorted]="sortField === 'imei_1'">
+                IMEI 1 <span class="material-icons sort-arrow">{{ sortField === 'imei_1' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+              </th>
+              <th>IMEI 2</th>
+              <th (click)="onSort('mobile_brand')" [class.sorted]="sortField === 'mobile_brand'">
+                Brand <span class="material-icons sort-arrow">{{ sortField === 'mobile_brand' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+              </th>
+              <th (click)="onSort('mobile_model')" [class.sorted]="sortField === 'mobile_model'">
+                Model <span class="material-icons sort-arrow">{{ sortField === 'mobile_model' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+              </th>
+              <th (click)="onSort('missing_date')" [class.sorted]="sortField === 'missing_date'">
+                Missing Date <span class="material-icons sort-arrow">{{ sortField === 'missing_date' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+              </th>
+              <th (click)="onSort('status')" [class.sorted]="sortField === 'status'">
+                Status <span class="material-icons sort-arrow">{{ sortField === 'status' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+              </th>
+              <th (click)="onSort('created_at')" [class.sorted]="sortField === 'created_at'">
+                Registered Date <span class="material-icons sort-arrow">{{ sortField === 'created_at' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let reg of registrations" (click)="openDetails(reg)" class="clickable-row">
+              <td class="text-truncate" [title]="reg.id">{{ reg.id }}</td>
+              <td class="font-bold">{{ reg.name }}</td>
+              <td>{{ reg.mobile_number }}</td>
+              <td>{{ reg.alternative_mobile_number || '-' }}</td>
+              <td>{{ reg.imei_1 }}</td>
+              <td>{{ reg.imei_2 || '-' }}</td>
+              <td>{{ reg.mobile_brand }}</td>
+              <td>{{ reg.mobile_model }}</td>
+              <td>{{ reg.missing_date | date:'yyyy-MM-dd' }}</td>
+              <td>
+                <span class="status-pill" [class]="reg.status.toLowerCase().replace(' ', '-')">
+                  {{ reg.status }}
+                </span>
+              </td>
+              <td>{{ reg.created_at | date:'yyyy-MM-dd HH:mm' }}</td>
+            </tr>
+            <tr *ngIf="registrations.length === 0">
+              <td colspan="11" class="no-records text-center">
+                <span class="material-icons">info_outline</span>
+                <p>No registrations match the query parameters.</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination node -->
+      <div class="pagination-container d-flex justify-between align-center" *ngIf="totalCount > 0">
+        <div class="pagination-info">
+          Showing {{ (page - 1) * limit + 1 }} to {{ page * limit > totalCount ? totalCount : page * limit }} of {{ totalCount }} records
+        </div>
+        
+        <div class="pagination-controls d-flex align-center gap-1">
+          <button 
+            class="btn-pagination" 
+            [disabled]="page === 1" 
+            (click)="goToPage(page - 1)">
+            <span class="material-icons">chevron_left</span>
+          </button>
+          
+          <button 
+            *ngFor="let p of pagesArray" 
+            class="btn-pagination" 
+            [class.active]="page === p" 
+            (click)="goToPage(p)">
+            {{ p }}
+          </button>
+          
+          <button 
+            class="btn-pagination" 
+            [disabled]="page === pagesArray.length" 
+            (click)="goToPage(page + 1)">
+            <span class="material-icons">chevron_right</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- Details Modal Drawer -->
+<div class="drawer-overlay" [class.show]="showDetailsDrawer" (click)="closeDetails()">
+  <div class="details-drawer" [class.show]="showDetailsDrawer" (click)="$event.stopPropagation()">
+    <div class="drawer-header d-flex justify-between align-center">
+      <h3>Case Registration Details</h3>
+      <button class="btn-close" (click)="closeDetails()"><span class="material-icons">close</span></button>
+    </div>
+    
+    <div class="drawer-body" *ngIf="selectedRegistration">
+      
+      <!-- Status Modifier -->
+      <div class="detail-section status-modifier-section bg-grey card">
+        <label for="updateStatusField">Update Recovery Case Status</label>
+        <select 
+          id="updateStatusField" 
+          [value]="selectedRegistration.status" 
+          (change)="onUpdateStatus(statusSelect.value)" 
+          #statusSelect>
+          <option *ngFor="let stat of statuses" [value]="stat">{{ stat }}</option>
+        </select>
+      </div>
+
+      <!-- Personal Info -->
+      <div class="detail-section">
+        <h4><span class="material-icons detail-sec-icon">person</span> Owner Personal Information</h4>
+        <table class="detail-table">
+          <tr>
+            <th>Name</th>
+            <td>{{ selectedRegistration.name }}</td>
+          </tr>
+          <tr>
+            <th>Primary Phone</th>
+            <td>{{ selectedRegistration.mobile_number }}</td>
+          </tr>
+          <tr>
+            <th>Alternate Phone</th>
+            <td>{{ selectedRegistration.alternative_mobile_number || 'N/A' }}</td>
+          </tr>
+          <tr>
+            <th>Email Address</th>
+            <td>{{ selectedRegistration.email || 'N/A' }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Device Specs -->
+      <div class="detail-section">
+        <h4><span class="material-icons detail-sec-icon">phone_android</span> Mobile Device Specifications</h4>
+        <table class="detail-table">
+          <tr>
+            <th>IMEI Number 1</th>
+            <td>{{ selectedRegistration.imei_1 }}</td>
+          </tr>
+          <tr>
+            <th>IMEI Number 2</th>
+            <td>{{ selectedRegistration.imei_2 || 'N/A' }}</td>
+          </tr>
+          <tr>
+            <th>Mobile Brand</th>
+            <td>{{ selectedRegistration.mobile_brand }}</td>
+          </tr>
+          <tr>
+            <th>Mobile Model</th>
+            <td>{{ selectedRegistration.mobile_model }}</td>
+          </tr>
+          <tr>
+            <th>Missing Date</th>
+            <td>{{ selectedRegistration.missing_date | date:'yyyy-MM-dd' }}</td>
+          </tr>
+          <tr>
+            <th>Missing Location</th>
+            <td>{{ selectedRegistration.missing_location }}</td>
+          </tr>
+          <tr>
+            <th>Police Complaint No</th>
+            <td>{{ selectedRegistration.police_complaint_no || 'N/A' }}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Incident Copy -->
+      <div class="detail-section" *ngIf="selectedRegistration.incident_description">
+        <h4><span class="material-icons detail-sec-icon">description</span> Incident Description</h4>
+        <p class="description-block">{{ selectedRegistration.incident_description }}</p>
+      </div>
+
+      <!-- Documents Uploaded -->
+      <div class="detail-section documents-section">
+        <h4><span class="material-icons detail-sec-icon">attachment</span> Uploaded Verification Proofs</h4>
+        <div class="doc-links grid gap-2">
+          
+          <!-- Invoice File -->
+          <div class="doc-card d-flex justify-between align-center" *ngIf="selectedRegistration.invoice_file">
+            <div class="d-flex align-center gap-2">
+              <span class="material-icons doc-icon">receipt_long</span>
+              <div>
+                <h5>Mobile Purchase Invoice</h5>
+                <p>Verify phone ownership proof</p>
+              </div>
+            </div>
+            <a [href]="'/uploads/' + selectedRegistration.invoice_file" target="_blank" class="btn btn-secondary btn-sm">
+              <span class="material-icons">visibility</span> View File
+            </a>
+          </div>
+
+          <!-- Photo File -->
+          <div class="doc-card d-flex justify-between align-center" *ngIf="selectedRegistration.mobile_photo">
+            <div class="d-flex align-center gap-2">
+              <span class="material-icons doc-icon text-blue">add_a_photo</span>
+              <div>
+                <h5>Device Photo</h5>
+                <p>Reference photo of the mobile</p>
+              </div>
+            </div>
+            <a [href]="'/uploads/' + selectedRegistration.mobile_photo" target="_blank" class="btn btn-secondary btn-sm">
+              <span class="material-icons">visibility</span> View File
+            </a>
+          </div>
+
+          <!-- FIR copy File -->
+          <div class="doc-card d-flex justify-between align-center" *ngIf="selectedRegistration.fir_file">
+            <div class="d-flex align-center gap-2">
+              <span class="material-icons doc-icon text-red">description</span>
+              <div>
+                <h5>FIR / Complaint Copy</h5>
+                <p>Official police registry copy</p>
+              </div>
+            </div>
+            <a [href]="'/uploads/' + selectedRegistration.fir_file" target="_blank" class="btn btn-secondary btn-sm">
+              <span class="material-icons">visibility</span> View File
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal Overlay -->
+<div class="modal-overlay" [class.show]="showSettingsModal" (click)="closeSettings()">
+  <div class="settings-modal" [class.show]="showSettingsModal" (click)="$event.stopPropagation()">
+    <div class="modal-header d-flex justify-between align-center">
+      <h3>Dynamic configurations</h3>
+      <button class="btn-close" (click)="closeSettings()"><span class="material-icons">close</span></button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="instaUsername">Configured Instagram Feed Account</label>
+        <div class="input-with-icon">
+          <span class="material-icons input-icon">camera_alt</span>
+          <input 
+            type="text" 
+            id="instaUsername" 
+            [(ngModel)]="newInstagramUsername" 
+            placeholder="Enter public username (e.g. godofmobiles)">
+        </div>
+        <p class="helper-text">This username dictates the profile links and mockup items loaded on the website landing page.</p>
+      </div>
+    </div>
+    
+    <div class="modal-footer d-flex justify-end gap-2">
+      <button class="btn btn-outline btn-sm" (click)="closeSettings()">Cancel</button>
+      <button class="btn btn-primary btn-sm" (click)="saveSettings()" [disabled]="isSavingSettings">
+        {{ isSavingSettings ? 'Saving...' : 'Save Settings' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="success-screen d-flex justify-center align-center">
+  <div class="success-card text-center animate-fade-in">
+    <div class="success-icon-box">
+      <span class="material-icons checkmark-icon">verified</span>
+    </div>
+    
+    <h1 class="success-title">{{ ts.t('success_title') }}</h1>
+    
+    <div class="success-message">
+      <p class="lang-text-en">{{ ts.t('success_line1') }}</p>
+      <p class="lang-text-sub">{{ ts.t('success_line2') }}</p>
+    </div>
+
+    <!-- Dual Language Success Notice for Maximum Lead reassurance -->
+    <div class="bilingual-notice" *ngIf="ts.currentLang() === 'en'">
+      <p class="tamil-translation">உங்கள் மொபைல் மீட்பு கோரிக்கை வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது. விரைவில் தொடர்பு கொள்வோம்.</p>
+    </div>
+    <div class="bilingual-notice" *ngIf="ts.currentLang() === 'ta'">
+      <p class="tamil-translation">Your registration was recorded successfully. Our team will contact you shortly.</p>
+    </div>
+
+    <div class="success-actions">
+      <a routerLink="/" class="btn btn-primary btn-lg">{{ ts.t('btn_back_home') }}</a>
+    </div>
+  </div>
+</div>

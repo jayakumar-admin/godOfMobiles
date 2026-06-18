@@ -1,0 +1,50 @@
+<div class="login-screen d-flex justify-center align-center">
+  <div class="login-card animate-fade-in">
+    <div class="login-header text-center">
+      <div class="logo-box">
+        <span class="material-icons logo-icon">security</span>
+      </div>
+      <h2>GOD OF Mobiles</h2>
+      <p>Admin Portal Authentication</p>
+    </div>
+
+    <!-- Alert error messages -->
+    <div class="alert alert-danger" *ngIf="errorMessage">
+      <span class="material-icons">error</span>
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Username -->
+      <div class="form-group" [class.has-error]="isInvalid('username')">
+        <label for="username">Username</label>
+        <div class="input-with-icon">
+          <span class="material-icons input-icon">person</span>
+          <input type="text" id="username" formControlName="username" placeholder="Enter username">
+        </div>
+        <span class="error-msg" *ngIf="isInvalid('username')">Username is required</span>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group" [class.has-error]="isInvalid('password')">
+        <label for="password">Password</label>
+        <div class="input-with-icon">
+          <span class="material-icons input-icon">lock</span>
+          <input type="password" id="password" formControlName="password" placeholder="Enter password">
+        </div>
+        <span class="error-msg" *ngIf="isInvalid('password')">Password is required</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" [disabled]="isSubmitting">
+        <span class="spinner" *ngIf="isSubmitting"></span>
+        {{ isSubmitting ? 'Authenticating...' : 'Sign In' }}
+      </button>
+
+      <div class="login-footer text-center">
+        <a routerLink="/" class="back-link">
+          <span class="material-icons">arrow_back</span> Back to Public Site
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

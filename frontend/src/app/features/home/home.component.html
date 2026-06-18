@@ -1,0 +1,288 @@
+<!-- Navigation Header -->
+<header class="header">
+  <div class="container header-container">
+    <div class="logo">
+      <span class="logo-accent">GOD OF</span> Mobiles
+    </div>
+    <nav class="nav">
+      <a routerLink="/" class="nav-link active">{{ ts.t('home') }}</a>
+      <a routerLink="/register" class="nav-link">{{ ts.t('register') }}</a>
+      <a routerLink="/admin/login" class="nav-link admin-link">{{ ts.t('admin') }}</a>
+      
+      <!-- Language Switcher Button -->
+      <div class="lang-switch">
+        <button 
+          (click)="setLanguage('en')" 
+          [class.active]="ts.currentLang() === 'en'" 
+          class="lang-btn">
+          EN
+        </button>
+        <span class="divider">|</span>
+        <button 
+          (click)="setLanguage('ta')" 
+          [class.active]="ts.currentLang() === 'ta'" 
+          class="lang-btn">
+          தமிழ்
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="container hero-container grid hero-grid animate-fade-in">
+    <div class="hero-content">
+      <h1 class="hero-title">{{ ts.t('hero_title') }}</h1>
+      <h2 class="hero-tagline">{{ ts.t('tagline') }}</h2>
+      <p class="hero-subtitle">{{ ts.t('hero_subtitle') }}</p>
+      
+      <div class="hero-actions">
+        <a routerLink="/register" class="btn btn-primary btn-lg">{{ ts.t('btn_register') }}</a>
+        <a href="#contact" class="btn btn-outline btn-lg">{{ ts.t('btn_contact') }}</a>
+      </div>
+    </div>
+    <div class="hero-image-container">
+      <img src="/images/mobile_tracker_hero.png" alt="Mobile Tracker Technology Grid" class="hero-img">
+      <div class="tracking-scanner-line"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Trust Building Section -->
+<section class="trust-section">
+  <div class="container">
+    <h2 class="section-title text-center">{{ ts.t('why_choose_us') }}</h2>
+    
+    <div class="trust-grid grid gap-4">
+      <div class="trust-card">
+        <div class="card-icon"><span class="material-icons">verified_user</span></div>
+        <h3 class="card-title">{{ ts.t('trust_card_1_title') }}</h3>
+        <p class="card-desc">{{ ts.t('trust_card_1_desc') }}</p>
+      </div>
+      
+      <div class="trust-card">
+        <div class="card-icon"><span class="material-icons">support_agent</span></div>
+        <h3 class="card-title">{{ ts.t('trust_card_2_title') }}</h3>
+        <p class="card-desc">{{ ts.t('trust_card_2_desc') }}</p>
+      </div>
+      
+      <div class="trust-card">
+        <div class="card-icon"><span class="material-icons">security</span></div>
+        <h3 class="card-title">{{ ts.t('trust_card_3_title') }}</h3>
+        <p class="card-desc">{{ ts.t('trust_card_3_desc') }}</p>
+      </div>
+      
+      <div class="trust-card">
+        <div class="card-icon"><span class="material-icons">query_stats</span></div>
+        <h3 class="card-title">{{ ts.t('trust_card_4_title') }}</h3>
+        <p class="card-desc">{{ ts.t('trust_card_4_desc') }}</p>
+      </div>
+      
+      <div class="trust-card">
+        <div class="card-icon"><span class="material-icons">gavel</span></div>
+        <h3 class="card-title">{{ ts.t('trust_card_5_title') }}</h3>
+        <p class="card-desc">{{ ts.t('trust_card_5_desc') }}</p>
+      </div>
+      
+      <div class="trust-card">
+        <div class="card-icon"><span class="material-icons">sentiment_very_satisfied</span></div>
+        <h3 class="card-title">{{ ts.t('trust_card_6_title') }}</h3>
+        <p class="card-desc">{{ ts.t('trust_card_6_desc') }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works-section">
+  <div class="container">
+    <h2 class="section-title text-center">{{ ts.t('how_it_works') }}</h2>
+    
+    <div class="steps-container grid gap-4">
+      <div class="step-card">
+        <div class="step-badge">{{ ts.t('step_1_title') }}</div>
+        <h3 class="step-name">{{ ts.t('step_1_name') }}</h3>
+        <p class="step-desc">{{ ts.t('step_1_desc') }}</p>
+      </div>
+      
+      <div class="step-card">
+        <div class="step-badge">{{ ts.t('step_2_title') }}</div>
+        <h3 class="step-name">{{ ts.t('step_2_name') }}</h3>
+        <p class="step-desc">{{ ts.t('step_2_desc') }}</p>
+      </div>
+      
+      <div class="step-card">
+        <div class="step-badge">{{ ts.t('step_3_title') }}</div>
+        <h3 class="step-name">{{ ts.t('step_3_name') }}</h3>
+        <p class="step-desc">{{ ts.t('step_3_desc') }}</p>
+      </div>
+      
+      <div class="step-card">
+        <div class="step-badge">{{ ts.t('step_4_title') }}</div>
+        <h3 class="step-name">{{ ts.t('step_4_name') }}</h3>
+        <p class="step-desc">{{ ts.t('step_4_desc') }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Statistics counters Banner -->
+<section class="stats-banner">
+  <div class="container stats-container grid">
+    <div class="stat-item">
+      <div class="stat-number">{{ registeredCases() | number }}</div>
+      <div class="stat-label">{{ ts.t('stats_registered') }}</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">{{ recoveredDevices() | number }}</div>
+      <div class="stat-label">{{ ts.t('stats_recovered') }}</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">{{ happyCustomers() | number }}</div>
+      <div class="stat-label">{{ ts.t('stats_happy') }}</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">{{ successRate() }}%</div>
+      <div class="stat-label">{{ ts.t('stats_rate') }}</div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+  <div class="container">
+    <h2 class="section-title text-center">{{ ts.t('testimonials_title') }}</h2>
+    
+    <div class="carousel-container">
+      <button class="carousel-control prev" (click)="prevReview()"><span class="material-icons">chevron_left</span></button>
+      
+      <div class="testimonial-slide">
+        <div class="rating">
+          <span class="material-icons star" *ngFor="let i of [1,2,3,4,5]">star</span>
+        </div>
+        <p class="review-text">"{{ reviews[activeReviewIndex()].text }}"</p>
+        <p class="review-author">- {{ reviews[activeReviewIndex()].author }}</p>
+      </div>
+      
+      <button class="carousel-control next" (click)="nextReview()"><span class="material-icons">chevron_right</span></button>
+    </div>
+    
+    <div class="carousel-indicators d-flex justify-center gap-1">
+      <span 
+        *ngFor="let rev of reviews; let i = index" 
+        [class.active]="activeReviewIndex() === i"
+        class="indicator"
+        (click)="activeReviewIndex.set(i)">
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- Promotional Section -->
+<section class="promo-section">
+  <div class="container promo-container grid">
+    <div class="promo-content">
+      <h3 class="promo-h1">{{ ts.t('promo_h1') }}</h3>
+      <h2 class="promo-h2">{{ ts.t('promo_h2') }}</h2>
+      <h3 class="promo-h3">{{ ts.t('promo_h3') }}</h3>
+      <p class="promo-desc">{{ ts.t('promo_desc') }}</p>
+      <a routerLink="/register" class="btn btn-secondary btn-lg">{{ ts.t('btn_register') }}</a>
+    </div>
+    <div class="promo-image-box">
+      <img src="/images/tech_shield.png" alt="Secure Encryption Shield" class="promo-bg-img">
+      <div class="promo-glass-card">
+        <div class="d-flex align-center gap-2">
+          <div class="badge-round"><span class="material-icons">lock</span></div>
+          <div>
+            <h4>100% Encrypted</h4>
+            <p>GDPR and Indian Data Protection Law compliant.</p>
+          </div>
+        </div>
+      </div>
+      <div class="promo-glass-card secondary-card">
+        <div class="d-flex align-center gap-2">
+          <div class="badge-round-gold"><span class="material-icons">speed</span></div>
+          <div>
+            <h4>Rapid Track Actions</h4>
+            <p>Immediate report dispatching to IMEI telecom network registries.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Instagram Integration Section -->
+<section class="instagram-section">
+  <div class="container">
+    <h2 class="section-title text-center">{{ ts.t('follow_us') }}</h2>
+    <p class="insta-handle text-center">&#64;{{ instagramUsername }}</p>
+    
+    <div class="insta-grid grid gap-3" *ngIf="instagramPosts.length > 0">
+      <div class="insta-post" *ngFor="let post of instagramPosts">
+        <img [src]="post.media_url" [alt]="post.caption" class="insta-img">
+        <a [href]="post.permalink" target="_blank" class="insta-overlay">
+          <span class="material-icons insta-icon">camera_alt</span>
+          <p class="insta-caption">{{ post.caption }}</p>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Details & Footer -->
+<footer id="contact" class="footer">
+  <div class="container footer-grid grid gap-4">
+    <div class="footer-info">
+      <h3>GOD OF Mobiles</h3>
+      <p class="tag">{{ ts.t('tagline') }}</p>
+      <div class="social-icons d-flex gap-2">
+        <a [href]="'https://www.instagram.com/' + instagramUsername" target="_blank"><span class="material-icons">camera_alt</span></a>
+        <a href="https://wa.me/919876543210" target="_blank"><span class="material-icons">chat</span></a>
+      </div>
+    </div>
+    
+    <div class="footer-contact">
+      <h4>Contact Information</h4>
+      <div class="contact-item d-flex align-center gap-2">
+        <span class="material-icons">call</span>
+        <a href="tel:+919876543210">+91 98765 43210</a>
+      </div>
+      <div class="contact-item d-flex align-center gap-2">
+        <span class="material-icons">chat</span>
+        <a href="https://wa.me/919876543210" target="_blank">+91 98765 43210 (WhatsApp)</a>
+      </div>
+      <div class="contact-item d-flex align-center gap-2">
+        <span class="material-icons">email</span>
+        <a href="mailto:support@godofmobiles.com">support&#64;godofmobiles.com</a>
+      </div>
+    </div>
+
+    <div class="footer-address">
+      <h4>Business Address</h4>
+      <div class="contact-item d-flex gap-2">
+        <span class="material-icons">location_on</span>
+        <address>
+          GOD OF Mobiles Recovery Center,<br>
+          12, Mount Road, T Nagar,<br>
+          Chennai - 600017,<br>
+          Tamil Nadu, India
+        </address>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer-bottom text-center">
+    <p>&copy; 2026 GOD OF Mobiles. All rights reserved. Registered under recovery agency network regulations.</p>
+  </div>
+</footer>
+
+<!-- WhatsApp Floating Chat Button (Always visible on mobile) -->
+<a href="https://wa.me/919876543210" target="_blank" class="whatsapp-floating-btn" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24" class="wa-icon" fill="currentColor">
+    <path d="M12.012 2c-5.506 0-9.988 4.482-9.988 9.988 0 1.76.459 3.473 1.33 4.986l-1.413 5.16 5.283-1.386a9.927 9.927 0 0 0 4.787 1.227h.005c5.504 0 9.987-4.482 9.987-9.988C22 6.482 17.518 2 12.012 2zm6.98 14.153c-.286.804-1.385 1.488-2.228 1.644-.575.106-1.32.193-3.83-.844-3.21-1.328-5.286-4.593-5.446-4.808-.16-.215-1.282-1.706-1.282-3.255 0-1.55.807-2.312 1.094-2.613.287-.301.626-.376.834-.376.208 0 .416.002.597.01.189.008.442-.072.693.53.257.618.882 2.146.958 2.298.077.152.128.329.027.531-.101.202-.152.329-.301.503-.15.174-.316.388-.45.521-.15.15-.306.314-.131.614.175.3.776 1.28 1.66 2.068.742.66 1.365.864 1.558.96.193.097.305.082.42-.05.115-.133.493-.574.626-.77.133-.197.266-.165.449-.098.183.067 1.157.546 1.356.645.2.099.333.148.383.234.05.086.05.498-.236 1.302z"/>
+  </svg>
+  <span class="wa-tooltip">{{ ts.t('whatsapp_chat_label') }}</span>
+</a>
