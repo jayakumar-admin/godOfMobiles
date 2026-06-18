@@ -1,8 +1,9 @@
 <!-- Admin Dashboard Header -->
 <header class="admin-header">
   <div class="container admin-nav d-flex justify-between align-center">
-    <div class="admin-logo">
-      <span class="badge-admin">Admin</span> GOD OF Mobiles
+    <div class="admin-logo d-flex align-center gap-2">
+      <span class="badge-admin">Admin</span>
+      <img src="/images/logo.png" alt="GOD OF Mobiles Logo" class="admin-logo-img">
     </div>
     <div class="admin-actions d-flex align-center gap-2">
       <button class="btn-icon" (click)="openSettings()" title="Settings">
@@ -81,6 +82,181 @@
         <div class="kpi-info">
           <h3>{{ stats().closedCases | number }}</h3>
           <p>Closed Cases</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Charts Data Visualisation Section -->
+    <section class="charts-section grid gap-3 animate-fade-in" *ngIf="trendPoints.length > 0 || brandBars.length > 0">
+      
+      <!-- Daily Trend Line/Area Chart -->
+      <div class="chart-card card trend-chart">
+        <div class="chart-header d-flex justify-between align-center">
+          <div class="chart-title-box">
+            <h4><span class="material-icons chart-title-icon">trending_up</span> Registration Trend</h4>
+            <p class="chart-subtitle">Daily registered devices (last 14 days)</p>
+          </div>
+          <div class="chart-summary-number" *ngIf="hoveredPoint">
+            <span class="trend-date-label">{{ hoveredPoint.label }}</span>
+            <strong class="trend-count-val">{{ hoveredPoint.count }} Cases</strong>
+          </div>
+          <div class="chart-summary-number" *ngIf="!hoveredPoint && trendPoints.length > 0">
+            <span class="trend-date-label">Latest: {{ trendPoints[trendPoints.length - 1].label }}</span>
+            <strong class="trend-count-val">{{ trendPoints[trendPoints.length - 1].count }} Cases</strong>
+          </div>
+        </div>
+        
+        <div class="chart-body">
+          <div class="svg-container">
+            <svg viewBox="0 0 500 200" width="100%" height="100%" preserveAspectRatio="none">
+              <!-- Defs for Gradients -->
+              <defs>
+                <linearGradient id="trendAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0"/>
+                </linearGradient>
+                <linearGradient id="trendLineGradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#3B82F6"/>
+                  <stop offset="50%" stop-color="#8B5CF6"/>
+                  <stop offset="100%" stop-color="#EC4899"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Gridlines -->
+              <g class="chart-gridlines">
+                <line *ngFor="let tick of trendYTicks" x1="40" [attr.y1]="tick.y" x2="480" [attr.y2]="tick.y" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4,4"></line>
+              </g>
+
+              <!-- Area Fill -->
+              <path [attr.d]="trendAreaPath" fill="url(#trendAreaGradient)"></path>
+
+              <!-- Line Path -->
+              <path [attr.d]="trendLinePath" fill="none" stroke="url(#trendLineGradient)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+
+              <!-- Hover Guides & Interactive Circles -->
+              <g class="chart-markers">
+                <circle 
+                  *ngFor="let p of trendPoints" 
+                  [attr.cx]="p.x" 
+                  [attr.cy]="p.y" 
+                  r="4.5" 
+                  [attr.fill]="hoveredPoint === p ? '#EC4899' : '#3B82F6'" 
+                  stroke="#FFFFFF" 
+                  stroke-width="1.5"
+                  class="chart-dot"
+                  [class.active]="hoveredPoint === p">
+                </circle>
+              </g>
+
+              <!-- Invisible hover detection areas (Vertical slivers for easy hover) -->
+              <g class="chart-hover-regions">
+                <rect 
+                  *ngFor="let p of trendPoints; let idx = index"
+                  [attr.x]="p.x - 15"
+                  y="20"
+                  width="30"
+                  height="150"
+                  fill="transparent"
+                  style="cursor: pointer;"
+                  (mouseenter)="hoveredPoint = p"
+                  (mouseleave)="hoveredPoint = null">
+                </rect>
+              </g>
+
+              <!-- Axes Text Labels -->
+              <!-- Y Axis Counts -->
+              <text *ngFor="let tick of trendYTicks" x="30" [attr.y]="tick.y + 4" class="axis-text text-right" text-anchor="end">{{ tick.val }}</text>
+              
+              <!-- X Axis Dates (Skip intermediate labels for clean spacing) -->
+              <g class="x-axis-labels">
+                <ng-container *ngFor="let p of trendPoints; let idx = index">
+                  <text 
+                    [attr.x]="p.x" 
+                    y="190" 
+                    class="axis-text text-center" 
+                    text-anchor="middle"
+                    *ngIf="idx % 2 === 0 || idx === trendPoints.length - 1">
+                    {{ p.label }}
+                  </text>
+                </ng-container>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Brand Distribution Bar Chart -->
+      <div class="chart-card card brand-chart">
+        <div class="chart-header d-flex justify-between align-center">
+          <div class="chart-title-box">
+            <h4><span class="material-icons chart-title-icon">bar_chart</span> Brand Distribution</h4>
+            <p class="chart-subtitle">Registrations by device mobile brand</p>
+          </div>
+          <div class="chart-summary-number" *ngIf="hoveredBar">
+            <span class="trend-date-label">{{ hoveredBar.brand }}</span>
+            <strong class="trend-count-val">{{ hoveredBar.count }} Cases</strong>
+          </div>
+          <div class="chart-summary-number" *ngIf="!hoveredBar && brandBars.length > 0">
+            <span class="trend-date-label">Leading: {{ brandBars[0].brand }}</span>
+            <strong class="trend-count-val">{{ brandBars[0].count }} Cases</strong>
+          </div>
+        </div>
+
+        <div class="chart-body">
+          <div class="svg-container">
+            <svg viewBox="0 0 500 200" width="100%" height="100%" preserveAspectRatio="none">
+              <!-- Defs for Bar Gradients -->
+              <defs>
+                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10B981"/>
+                  <stop offset="100%" stop-color="#059669"/>
+                </linearGradient>
+                <linearGradient id="barHoverGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#34D399"/>
+                  <stop offset="100%" stop-color="#10B981"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Gridlines -->
+              <g class="chart-gridlines">
+                <line *ngFor="let tick of brandYTicks" x1="40" [attr.y1]="tick.y" x2="480" [attr.y2]="tick.y" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4,4"></line>
+              </g>
+
+              <!-- Bar Rectangles -->
+              <g class="chart-bars">
+                <rect 
+                  *ngFor="let bar of brandBars" 
+                  [attr.x]="bar.x" 
+                  [attr.y]="bar.y" 
+                  [attr.width]="bar.width" 
+                  [attr.height]="bar.height" 
+                  [attr.fill]="hoveredBar === bar ? 'url(#barHoverGradient)' : 'url(#barGradient)'"
+                  rx="4"
+                  ry="4"
+                  class="chart-bar"
+                  (mouseenter)="hoveredBar = bar"
+                  (mouseleave)="hoveredBar = null"
+                  style="cursor: pointer; transition: all 0.2s ease;">
+                </rect>
+              </g>
+
+              <!-- Y Axis Counts -->
+              <text *ngFor="let tick of brandYTicks" x="30" [attr.y]="tick.y + 4" class="axis-text text-right" text-anchor="end">{{ tick.val }}</text>
+
+              <!-- X Axis Labels (Brands) -->
+              <g class="x-axis-labels">
+                <text 
+                  *ngFor="let bar of brandBars" 
+                  [attr.x]="bar.labelX" 
+                  y="190" 
+                  class="axis-text text-center text-brand-label" 
+                  text-anchor="middle">
+                  {{ bar.brand }}
+                </text>
+              </g>
+            </svg>
+          </div>
         </div>
       </div>
 
@@ -253,6 +429,11 @@
         </div>
       </div>
     </section>
+
+    <div class="promoter-container" style="margin-top: 2rem; padding-bottom: 2rem;">
+      <span>Developed by</span>
+      <span class="promoter-title">AJR Digital Hub</span>
+    </div>
 
   </div>
 </main>

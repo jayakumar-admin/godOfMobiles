@@ -73,11 +73,6 @@ const validateRegistration = (req, res, next) => {
     errors.consent = 'Consent is required / அனுமதி ஒப்புதல் தேவை';
   }
 
-  // Validate uploaded files
-  if (!req.files || !req.files['invoice_file']) {
-    errors.invoice_file = 'Mobile Invoice is required / மொபைல் இன்வாய்ஸ் தேவை';
-  }
-
   if (Object.keys(errors).length > 0) {
     return res.status(400).json({ success: false, errors });
   }

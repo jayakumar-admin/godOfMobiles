@@ -198,7 +198,34 @@ const getDashboardStats = async (req, res) => {
         COUNT(CASE WHEN status = 'Closed' THEN 1 END) as closed
       FROM mobile_registrations
     `;
-    const statsResult = await db.query(statsQuery);
+
+    // Daily trend query (last 14 days)
+    const trendQuery = `
+      SELECT 
+        TO_CHAR(created_at, 'YYYY-MM-DD') as date, 
+        COUNT(*)::integer as count
+      FROM mobile_registrations
+      WHERE created_at >= CURRENT_DATE - INTERVAL '14 days'
+      GROUP BY CAST(created_at AS DATE), TO_CHAR(created_at, 'YYYY-MM-DD')
+      ORDER BY CAST(created_at AS DATE) ASC;
+    `;
+
+    // Brand distribution query
+    const brandQuery = `
+      SELECT 
+        COALESCE(NULLIF(TRIM(mobile_brand), ''), 'Other') as brand, 
+        COUNT(*)::integer as count
+      FROM mobile_registrations
+      GROUP BY COALESCE(NULLIF(TRIM(mobile_brand), ''), 'Other')
+      ORDER BY count DESC;
+    `;
+
+    const [statsResult, trendResult, brandResult] = await Promise.all([
+      db.query(statsQuery),
+      db.query(trendQuery),
+      db.query(brandQuery)
+    ]);
+
     const row = statsResult.rows[0];
 
     const total = parseInt(row.total, 10);
@@ -222,7 +249,9 @@ const getDashboardStats = async (req, res) => {
         underReviewCases: countUnderReview,
         recoveryInProgress: countInProgress,
         recoveredCases: countRecovered,
-        closedCases: countClosed
+        closedCases: countClosed,
+        dailyTrend: trendResult.rows,
+        brandDistribution: brandResult.rows
       }
     });
   } catch (err) {

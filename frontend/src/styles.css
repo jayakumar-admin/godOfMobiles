@@ -157,12 +157,34 @@ button {
   font-weight: 800;
   color: var(--text-light);
   letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
 }
 .logo a {
   color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 .logo-accent {
   color: var(--secondary);
+}
+.logo-img {
+  height: 42px;
+  width: auto;
+  display: block;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+.logo-img:hover {
+  transform: scale(1.05);
+}
+.admin-logo-img {
+  height: 36px;
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: var(--radius-sm);
 }
 .nav {
   display: flex;
@@ -493,5 +515,283 @@ button {
     display: none !important;
   }
 }
+
+/* ==========================================================================
+   AJR Digital Hub Promoter Styles & Animations
+   ========================================================================== */
+.promoter-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: #94A3B8;
+  letter-spacing: 0.5px;
+}
+
+.promoter-title {
+  color: var(--secondary);
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: var(--radius-sm);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.05);
+}
+
+/* Blinking cursor at the end */
+.promoter-title::after {
+  content: '_';
+  color: var(--secondary);
+  font-weight: 900;
+  animation: p-blink 1s steps(2, start) infinite;
+  margin-left: 2px;
+}
+
+/* Hologram laser scanner sweeping across */
+.promoter-title::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(212, 175, 55, 0.25),
+    transparent
+  );
+  animation: p-scan 3s infinite linear;
+}
+
+.promoter-title:hover {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: var(--secondary);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+  transform: translateY(-1px);
+  color: var(--text-light);
+}
+
+@keyframes p-blink {
+  to { visibility: hidden; }
+}
+
+@keyframes p-scan {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Promoter Global Modal Style Sheet */
+.p-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.p-modal-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.p-modal-card {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: var(--radius-xl);
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.15);
+  overflow: hidden;
+  position: relative;
+  padding: 2.5rem 2rem;
+  transform: translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-light);
+  text-align: center;
+}
+
+.p-modal-overlay.show .p-modal-card {
+  transform: translateY(0);
+}
+
+/* Hologram glow filter */
+.p-modal-glow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 4px;
+  background: var(--secondary);
+  box-shadow: 0 0 20px 3px var(--secondary);
+}
+
+.p-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.p-header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.p-header-title h3 {
+  font-size: 1.4rem;
+  color: var(--text-light) !important;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 0;
+}
+
+.p-tech-pulse {
+  color: var(--secondary);
+  animation: p-pulse 2s infinite ease-in-out;
+}
+
+.p-modal-close {
+  color: #94A3B8;
+  font-size: 1.8rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.p-modal-close:hover {
+  color: var(--text-light);
+}
+
+.p-tech-icon-box {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.p-tech-icon-box .material-icons {
+  font-size: 2.5rem;
+  color: var(--secondary);
+  z-index: 2;
+}
+
+.p-icon-scanner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--secondary);
+  box-shadow: 0 0 10px var(--secondary);
+  animation: p-icon-sweep 2.5s infinite linear;
+}
+
+.p-modal-body h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--text-light);
+}
+
+.p-modal-body p {
+  color: #94A3B8;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.p-modal-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.p-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+  color: var(--primary) !important;
+  text-decoration: none;
+}
+
+.p-btn-primary {
+  background-color: var(--secondary);
+}
+
+.p-btn-primary:hover {
+  background-color: var(--secondary-hover);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+  transform: translateY(-2px);
+}
+
+.p-btn-insta {
+  background-color: #E1306C;
+  color: white !important;
+}
+
+.p-btn-insta:hover {
+  background-color: #C13584;
+  box-shadow: 0 0 15px rgba(225, 48, 108, 0.4);
+  transform: translateY(-2px);
+}
+
+.p-btn-whatsapp {
+  background-color: #25D366;
+  color: white !important;
+}
+
+.p-btn-whatsapp:hover {
+  background-color: #128C7E;
+  box-shadow: 0 0 15px rgba(37, 211, 102, 0.4);
+  transform: translateY(-2px);
+}
+
+@keyframes p-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes p-icon-sweep {
+  0% { top: 0; }
+  50% { top: 100%; }
+  100% { top: 0; }
+}
+
 
 

@@ -10,5 +10,63 @@
 </head>
 <body>
   <app-root></app-root>
+
+  <!-- Global AJR Digital Hub Promoter Modal -->
+  <div id="promoterModal" class="p-modal-overlay">
+    <div class="p-modal-card">
+      <div class="p-modal-glow"></div>
+      <div class="p-modal-header">
+        <div class="p-header-title">
+          <span class="material-icons p-tech-pulse">developer_mode</span>
+          <h3>AJR Digital Hub</h3>
+        </div>
+        <button class="p-modal-close" onclick="closePromoterModal()">&times;</button>
+      </div>
+      <div class="p-modal-body">
+        <div class="p-tech-icon-box">
+          <div class="p-icon-scanner"></div>
+          <span class="material-icons">rocket_launch</span>
+        </div>
+        <h4>Are you looking to improve your business?</h4>
+        <p>Please contact our solution partner to scale and optimize your business with our custom software solutions.</p>
+        <div class="p-modal-links">
+          <a href="https://ajrdigitalhub.in" target="_blank" class="p-btn p-btn-primary">
+            <span class="material-icons">language</span> Website
+          </a>
+          <a href="https://wa.me/918903035099?text=Hello%20AJR%20Groups%2C%20i%20have%20interested%20in%20web%20page%20marketing%2C%20could%20u%20share%20more%20details%20on%20this." target="_blank" class="p-btn p-btn-whatsapp">
+            <span class="material-icons">chat</span> WhatsApp
+          </a>
+          <a href="https://www.instagram.com/ajr_digital_hub/" target="_blank" class="p-btn p-btn-insta">
+            <span class="material-icons">camera_alt</span> Instagram
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openPromoterModal(e) {
+      if (e) e.preventDefault();
+      document.getElementById('promoterModal').classList.add('show');
+    }
+    function closePromoterModal() {
+      document.getElementById('promoterModal').classList.remove('show');
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('promoterModal');
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closePromoterModal();
+        }
+      });
+      // Delegate click event for the class .promoter-title anywhere on the page
+      document.body.addEventListener('click', (e) => {
+        const titleEl = e.target.classList.contains('promoter-title') ? e.target : e.target.closest('.promoter-title');
+        if (titleEl) {
+          openPromoterModal(e);
+        }
+      });
+    });
+  </script>
 </body>
 </html>

@@ -26,11 +26,6 @@ export class RegisterComponent implements OnInit {
     'Google Pixel', 'Other'
   ];
 
-  // Selected files tracking
-  invoiceFile: File | null = null;
-  mobilePhoto: File | null = null;
-  firCopy: File | null = null;
-
   constructor(
     private fb: FormBuilder,
     public ts: TranslationService,
@@ -59,25 +54,8 @@ export class RegisterComponent implements OnInit {
       missing_location: ['', [Validators.required]],
       police_complaint_no: ['', [Validators.maxLength(100)]],
       incident_description: [''],
-      invoice_file: [null, [Validators.required]], // Used for ownership validation
       consent: [false, [Validators.requiredTrue]]
     });
-  }
-
-  // File Handlers
-  onFileSelected(event: any, field: string) {
-    const file = event.target.files[0];
-    if (file) {
-      if (field === 'invoice_file') {
-        this.invoiceFile = file;
-        this.registerForm.patchValue({ invoice_file: file });
-        this.registerForm.get('invoice_file')?.updateValueAndValidity();
-      } else if (field === 'mobile_photo') {
-        this.mobilePhoto = file;
-      } else if (field === 'fir_file') {
-        this.firCopy = file;
-      }
-    }
   }
 
   onSubmit() {
@@ -93,23 +71,12 @@ export class RegisterComponent implements OnInit {
     
     // Append standard fields
     Object.keys(this.registerForm.value).forEach(key => {
-      if (!['invoice_file', 'consent'].includes(key)) {
+      if (key !== 'consent') {
         formData.append(key, this.registerForm.value[key]);
       }
     });
 
     formData.append('consent', 'true');
-
-    // Append files
-    if (this.invoiceFile) {
-      formData.append('invoice_file', this.invoiceFile);
-    }
-    if (this.mobilePhoto) {
-      formData.append('mobile_photo', this.mobilePhoto);
-    }
-    if (this.firCopy) {
-      formData.append('fir_file', this.firCopy);
-    }
 
     this.isSubmitting = true;
     

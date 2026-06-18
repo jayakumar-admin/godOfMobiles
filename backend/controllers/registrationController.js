@@ -23,13 +23,6 @@ const createRegistration = async (req, res) => {
     const mobile_photo = req.files && req.files['mobile_photo'] ? req.files['mobile_photo'][0].filename : null;
     const fir_file = req.files && req.files['fir_file'] ? req.files['fir_file'][0].filename : null;
 
-    if (!invoice_file) {
-      return res.status(400).json({
-        success: false,
-        errors: { invoice_file: 'Mobile invoice is required / மொபைல் இன்வாய்ஸ் தேவை' }
-      });
-    }
-
     const id = crypto.randomUUID();
 
     const query = `
@@ -86,49 +79,42 @@ const getInstagramFeed = async (req, res) => {
     const settingsResult = await db.query(settingsQuery, ['instagram_username']);
     const username = settingsResult.rows.length > 0 ? settingsResult.rows[0].value : 'godofmobiles';
 
-    // Mock grid for high-end feel displaying dynamic images
+    // Real extracted posts list using local public assets to prevent URL expiration
     const posts = [
       {
         id: 'inst_1',
-        media_url: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop',
-        permalink: `https://www.instagram.com/${username}/`,
-        caption: 'Another device recovered successfully! Trust our experts to locate your lost phone. #mobilerecovery #godofmobiles',
+        media_url: '/images/instagram/post1.jpg',
+        permalink: 'https://www.instagram.com/godofmobiles/reel/DAJBcm7AFlQ/',
+        caption: 'Hi guys if you lost your mobile.contact me I will help you \nTq frnds 🤝.\n.\n.\n.\n.\n#tanjavur#mobiles \n#tamilnadu #findmydevice \n#trending #location',
         timestamp: new Date().toISOString()
       },
       {
         id: 'inst_2',
-        media_url: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=600&auto=format&fit=crop',
-        permalink: `https://www.instagram.com/${username}/`,
-        caption: 'Lost your mobile phone? Don\'t panic. Follow our 4-step recovery guidance now. #safetyfirst',
+        media_url: '/images/instagram/post2.jpg',
+        permalink: 'https://www.instagram.com/godofmobiles/reel/C9aDi6VMXHk/',
+        caption: 'Hi friends if you lost your mobile contact me I will help you tq frnds 🤝.\n.\n.\n.\n.\n#tamilreels \n#mobiles #findmymobile \n#location #mobilemissing',
         timestamp: new Date(Date.now() - 86400000).toISOString()
       },
       {
         id: 'inst_3',
-        media_url: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop',
-        permalink: `https://www.instagram.com/${username}/`,
-        caption: 'Bilingual support in English and Tamil. Contact our team instantly via WhatsApp. #tamilnadu #recovery',
+        media_url: '/images/instagram/post3.jpg',
+        permalink: 'https://www.instagram.com/godofmobiles/reel/C43GwYeSjx-/',
+        caption: 'Hi friends if loss your mobile  contact me I will help you tq frnds 🤝.\n.\n.\n#mobiles #reels \n#findmymobile #findmydevice \n#trending #tamilnadu #tiruchy',
         timestamp: new Date(Date.now() - 172800000).toISOString()
       },
       {
         id: 'inst_4',
-        media_url: 'https://images.unsplash.com/photo-1565849906461-09a2fa5000af?q=80&w=600&auto=format&fit=crop',
-        permalink: `https://www.instagram.com/${username}/`,
-        caption: 'Security and high trust. We keep your device details safe during search. #securedata #privacy',
+        media_url: '/images/instagram/post4.jpg',
+        permalink: 'https://www.instagram.com/godofmobiles/reel/DZfAmjRuiiQ/',
+        caption: 'Hi chennai guys if you lost your mobile dm me\nI will help you tq guys 🤝.\n.\n.\n.\n.\n.#mobile #chennai \n#finemydevice #trendingreels \n#godofmobiles',
         timestamp: new Date(Date.now() - 259200000).toISOString()
       },
       {
         id: 'inst_5',
-        media_url: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=600&auto=format&fit=crop',
-        permalink: `https://www.instagram.com/${username}/`,
-        caption: 'Check out our 98% success rate in tracking and recovering IMEI. #trackphone #imei',
+        media_url: '/images/instagram/post5.jpg',
+        permalink: 'https://www.instagram.com/godofmobiles/reel/DXMLkHdEfW3/',
+        caption: 'Hi thiruchy guys if you lost your mobile dm me \nI will help you tq guys 🤝. \n\n.\n.\n.\n#mobiles #thiruchirapalli \n#findmydevice #trendingreels \n#dindigul',
         timestamp: new Date(Date.now() - 345600000).toISOString()
-      },
-      {
-        id: 'inst_6',
-        media_url: 'https://images.unsplash.com/photo-1523206489230-c012c64b2b48?q=80&w=600&auto=format&fit=crop',
-        permalink: `https://www.instagram.com/${username}/`,
-        caption: 'Quick Tips: Write down your IMEI numbers and register police complaints immediately when lost. #mobilesafety',
-        timestamp: new Date(Date.now() - 432000000).toISOString()
       }
     ];
 
