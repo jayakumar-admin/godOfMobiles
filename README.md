@@ -117,7 +117,7 @@ DB_PASSWORD=your_postgres_password
 DB_NAME=godofmobiles
 DB_PORT=5432
 JWT_SECRET=your_custom_secure_jwt_secret_string
-ADMIN_DEFAULT_PASSWORD=admin123
+ADMIN_DEFAULT_PASSWORD=ramTech604302
 ```
 
 ### Step 3: Start Backend API Server
@@ -162,7 +162,7 @@ The easiest way to run the entire stack in production-like configuration.
 
 *   **URL**: `http://localhost/admin` (or `http://localhost:4200/admin` in dev mode)
 *   **Seeded Username**: `admin`
-*   **Seeded Password**: `admin123` *(configurable via ADMIN_DEFAULT_PASSWORD environment variable before seed run)*
+*   **Seeded Password**: `ramTech604302` *(configurable via ADMIN_DEFAULT_PASSWORD environment variable before seed run)*
 
 ---
 

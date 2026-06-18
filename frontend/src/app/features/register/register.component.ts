@@ -46,6 +46,7 @@ export class RegisterComponent implements OnInit {
       mobile_number: ['', [Validators.required, Validators.pattern(mobilePattern)]],
       alternative_mobile_number: ['', [Validators.pattern(mobilePattern)]],
       email: ['', [Validators.email, Validators.maxLength(150)]],
+      instagram_id: ['', [Validators.required]],
       imei_1: ['', [Validators.required, Validators.pattern(imeiPattern)]],
       imei_2: ['', [Validators.pattern(imeiPattern)]],
       mobile_brand: ['', [Validators.required]],

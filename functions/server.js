@@ -3,7 +3,7 @@ const db = require('./config/database');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.APP_PORT || 3000;
 
 // Programmatic DB Initializer to ensure table presence
 const initializeDatabase = async () => {
@@ -37,6 +37,7 @@ const initializeDatabase = async () => {
         missing_location TEXT,
         police_complaint_no VARCHAR(100),
         incident_description TEXT,
+        instagram_id VARCHAR(150) NOT NULL,
         invoice_file VARCHAR(500),
         mobile_photo VARCHAR(500),
         fir_file VARCHAR(500),
@@ -45,6 +46,11 @@ const initializeDatabase = async () => {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Add column if table already exists without instagram_id
+    try {
+      await db.query('ALTER TABLE mobile_registrations ADD COLUMN IF NOT EXISTS instagram_id VARCHAR(150) NOT NULL DEFAULT \'\'');
+    } catch (e) { console.error('Alter table error:', e); }
 
     // Create Dynamic Configuration Settings Table
     await db.query(`

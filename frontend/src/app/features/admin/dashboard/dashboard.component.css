@@ -289,6 +289,22 @@
 .status-pill.recovered { background-color: rgba(16, 185, 129, 0.15); color: var(--success); }
 .status-pill.closed { background-color: rgba(100, 116, 139, 0.15); color: var(--text-gray); }
 
+/* Instagram ID Link */
+.insta-link {
+  color: #E1306C;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: var(--transition-fast);
+}
+.insta-link:hover {
+  color: #C13584;
+  text-decoration: underline;
+}
+
 /* Pagination Container */
 .pagination-container {
   padding: 1.5rem 2rem;

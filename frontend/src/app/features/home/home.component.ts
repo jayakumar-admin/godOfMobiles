@@ -35,12 +35,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     public ts: TranslationService,
     private api: ApiService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.fetchInstagramFeed();
     this.animateCounters();
-    
+
     // Auto rotate testimonials every 6 seconds
     this.carouselSub = interval(6000).subscribe(() => {
       this.nextReview();
@@ -81,18 +81,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     const duration = 2500; // 2.5 seconds duration
     const steps = 60;
     const stepTime = duration / steps;
-    
+
     const targets = {
-      registered: 18450,
-      recovered: 16120,
-      happy: 17890,
-      rate: 98
+      registered: 150,
+      recovered: 120,
+      happy: 120,
+      rate: 99
     };
 
     let currentStep = 0;
     const timer = setInterval(() => {
       currentStep++;
-      
+
       this.registeredCases.set(Math.floor((targets.registered / steps) * currentStep));
       this.recoveredDevices.set(Math.floor((targets.recovered / steps) * currentStep));
       this.happyCustomers.set(Math.floor((targets.happy / steps) * currentStep));

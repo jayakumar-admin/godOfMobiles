@@ -349,6 +349,7 @@
                 Mobile <span class="material-icons sort-arrow">{{ sortField === 'mobile_number' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
               <th>Alternative Mobile</th>
+              <th>Instagram ID</th>
               <th (click)="onSort('imei_1')" [class.sorted]="sortField === 'imei_1'">
                 IMEI 1 <span class="material-icons sort-arrow">{{ sortField === 'imei_1' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
@@ -376,6 +377,12 @@
               <td class="font-bold">{{ reg.name }}</td>
               <td>{{ reg.mobile_number }}</td>
               <td>{{ reg.alternative_mobile_number || '-' }}</td>
+              <td>
+                <a *ngIf="reg.instagram_id" [href]="'https://instagram.com/' + reg.instagram_id" target="_blank" class="insta-link">
+                  <span class="material-icons" style="font-size: 14px; vertical-align: middle;">camera_alt</span> {{ reg.instagram_id }}
+                </a>
+                <span *ngIf="!reg.instagram_id">-</span>
+              </td>
               <td>{{ reg.imei_1 }}</td>
               <td>{{ reg.imei_2 || '-' }}</td>
               <td>{{ reg.mobile_brand }}</td>
@@ -389,7 +396,7 @@
               <td>{{ reg.created_at | date:'yyyy-MM-dd HH:mm' }}</td>
             </tr>
             <tr *ngIf="registrations.length === 0">
-              <td colspan="11" class="no-records text-center">
+              <td colspan="12" class="no-records text-center">
                 <span class="material-icons">info_outline</span>
                 <p>No registrations match the query parameters.</p>
               </td>
@@ -479,6 +486,15 @@
           <tr>
             <th>Email Address</th>
             <td>{{ selectedRegistration.email || 'N/A' }}</td>
+          </tr>
+          <tr>
+            <th>Instagram ID</th>
+            <td>
+              <a *ngIf="selectedRegistration.instagram_id" [href]="'https://instagram.com/' + selectedRegistration.instagram_id" target="_blank" class="insta-link">
+                <span class="material-icons" style="font-size: 16px; vertical-align: middle;">camera_alt</span> {{ '@' + selectedRegistration.instagram_id }}
+              </a>
+              <span *ngIf="!selectedRegistration.instagram_id">N/A</span>
+            </td>
           </tr>
         </table>
       </div>

@@ -152,6 +152,17 @@
               <span class="error-msg" *ngIf="serverErrors['email']">{{ serverErrors['email'] }}</span>
             </div>
 
+            <!-- Instagram ID -->
+            <div class="form-group" [class.has-error]="isInvalid('instagram_id') || serverErrors['instagram_id']">
+              <label for="instagram_id">Instagram ID <span class="required">*</span></label>
+              <div class="input-with-icon">
+                <span class="material-icons input-icon">photo_camera</span>
+                <input type="text" id="instagram_id" formControlName="instagram_id" placeholder="e.g. @yourinsta" />
+              </div>
+              <span class="error-msg" *ngIf="isInvalid('instagram_id')">{{ ts.t('val_required') }}</span>
+              <span class="error-msg" *ngIf="serverErrors['instagram_id']">{{ serverErrors['instagram_id'] }}</span>
+            </div>
+
           </div>
         </div>
 

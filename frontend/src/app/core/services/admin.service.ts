@@ -6,10 +6,10 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class AdminService {
-  private baseUrl = '/api/admin';
+  private baseUrl = 'https://api-ymcsyccz5a-uc.a.run.app/api/admin';
   token = signal<string | null>(localStorage.getItem('admin_token'));
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   login(credentials: any): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/login`, credentials).pipe(
