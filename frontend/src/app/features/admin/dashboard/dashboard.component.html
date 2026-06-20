@@ -275,7 +275,7 @@
               type="text" 
               id="search" 
               [(ngModel)]="search" 
-              placeholder="Search Name, Phone, IMEI, Model..." 
+              placeholder="Search Name, Phone, IMEI..." 
               (keyup.enter)="onApplyFilters()">
           </div>
         </div>
@@ -357,9 +357,6 @@
               <th (click)="onSort('mobile_brand')" [class.sorted]="sortField === 'mobile_brand'">
                 Brand <span class="material-icons sort-arrow">{{ sortField === 'mobile_brand' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
-              <th (click)="onSort('mobile_model')" [class.sorted]="sortField === 'mobile_model'">
-                Model <span class="material-icons sort-arrow">{{ sortField === 'mobile_model' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
-              </th>
               <th (click)="onSort('missing_date')" [class.sorted]="sortField === 'missing_date'">
                 Missing Date <span class="material-icons sort-arrow">{{ sortField === 'missing_date' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
@@ -385,8 +382,7 @@
               </td>
               <td>{{ reg.imei_1 }}</td>
               <td>{{ reg.imei_2 || '-' }}</td>
-              <td>{{ reg.mobile_brand }}</td>
-              <td>{{ reg.mobile_model }}</td>
+               <td>{{ reg.mobile_brand }}</td>
               <td>{{ reg.missing_date | date:'yyyy-MM-dd' }}</td>
               <td>
                 <span class="status-pill" [class]="reg.status.toLowerCase().replace(' ', '-')">
@@ -396,7 +392,7 @@
               <td>{{ reg.created_at | date:'yyyy-MM-dd HH:mm' }}</td>
             </tr>
             <tr *ngIf="registrations.length === 0">
-              <td colspan="12" class="no-records text-center">
+              <td colspan="11" class="no-records text-center">
                 <span class="material-icons">info_outline</span>
                 <p>No registrations match the query parameters.</p>
               </td>
@@ -516,20 +512,8 @@
             <td>{{ selectedRegistration.mobile_brand }}</td>
           </tr>
           <tr>
-            <th>Mobile Model</th>
-            <td>{{ selectedRegistration.mobile_model }}</td>
-          </tr>
-          <tr>
             <th>Missing Date</th>
             <td>{{ selectedRegistration.missing_date | date:'yyyy-MM-dd' }}</td>
-          </tr>
-          <tr>
-            <th>Missing Location</th>
-            <td>{{ selectedRegistration.missing_location }}</td>
-          </tr>
-          <tr>
-            <th>Police Complaint No</th>
-            <td>{{ selectedRegistration.police_complaint_no || 'N/A' }}</td>
           </tr>
         </table>
       </div>

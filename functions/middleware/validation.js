@@ -57,16 +57,8 @@ const validateRegistration = (req, res, next) => {
     errors.mobile_brand = 'Mobile brand is required / மொபைல் பிராண்ட் தேவை';
   }
 
-  if (!mobile_model || mobile_model.trim() === '') {
-    errors.mobile_model = 'Mobile model is required / மொபைல் மாடல் தேவை';
-  }
-
   if (!missing_date || missing_date.trim() === '') {
     errors.missing_date = 'Missing date is required / தொலைந்த தேதி தேவை';
-  }
-
-  if (!missing_location || missing_location.trim() === '') {
-    errors.missing_location = 'Missing location is required / தொலைந்த இடம் தேவை';
   }
 
   if (!consent || consent === 'false' || consent === false) {

@@ -90,6 +90,7 @@ export class TranslationService {
       val_imei_len: 'Must be exactly 15 digits',
       val_consent: 'You must authorize to proceed',
       val_file_req: 'Invoice file is required',
+      val_future_date: 'Date cannot be in the future',
       
       // Success keys
       success_title: 'Thank You!',
@@ -107,7 +108,7 @@ export class TranslationService {
       hero_subtitle: 'உங்கள் மொபைல் தொலைந்துவிட்டதா? அதை மீட்க எங்கள் மீட்பு குழுவினர் உதவுகிறார்கள்.',
       btn_register: 'தொலைந்த மொபைலை பதிவு செய்க',
       btn_contact: 'ஆதரவைத் தொடர்பு கொள்ளவும்',
-      why_choose_us: 'ஏன் எங்களை தேர்வு செய்ய வேண்டும்?',
+      why_choose_us: 'ஏன் எங்களை தேர்வு வேண்டும்?',
       trust_card_1_title: 'நம்பகமான மீட்பு வல்லுநர்கள்',
       trust_card_1_desc: 'தொலைந்த ஸ்மார்ட்போன்களைக் கண்டுபிடிப்பதில் பல வருட அனுபவம் பெற்ற தொழில்நுட்ப வல்லுநர்கள்.',
       trust_card_2_title: 'வேகமான வாடிக்கையாளர் ஆதரவு',
@@ -176,6 +177,7 @@ export class TranslationService {
       val_imei_len: 'சரியாக 15 இலக்கங்கள் இருக்க வேண்டும்',
       val_consent: 'தொடர நீங்கள் அனுமதிக்க வேண்டும்',
       val_file_req: 'இன்வாய்ஸ் கோப்பு கட்டாயமாகும்',
+      val_future_date: 'தேதி எதிர்காலமாக இருக்கக்கூடாது',
       
       success_title: 'நன்றி!',
       success_line1: 'உங்கள் கோரிக்கை வெற்றிகரமாக பதிவு செய்யப்பட்டுள்ளது.',

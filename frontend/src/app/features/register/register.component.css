@@ -342,6 +342,19 @@
   color: var(--secondary);
 }
 
+/* Style Calendar Picker Button (White/Visible) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
 .full-width-field {
   grid-column: span 2;
   margin-top: 1.5rem;

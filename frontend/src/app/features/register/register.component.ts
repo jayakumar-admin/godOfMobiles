@@ -18,6 +18,7 @@ export class RegisterComponent implements OnInit {
   isSubmitting = false;
   serverErrors: Record<string, string> = {};
   serverMessage = '';
+  maxDate = '';
 
   // Brand Options
   brands = [
@@ -34,8 +35,23 @@ export class RegisterComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    this.maxDate = `${yyyy}-${mm}-${dd}`;
+
     this.initForm();
   }
+
+  futureDateValidator = (control: any) => {
+    if (!control.value) return null;
+    const selectedDate = new Date(control.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
+    return selectedDate > today ? { futureDate: true } : null;
+  };
 
   initForm() {
     const mobilePattern = /^[6-9]\d{9}$/;
@@ -50,10 +66,7 @@ export class RegisterComponent implements OnInit {
       imei_1: ['', [Validators.required, Validators.pattern(imeiPattern)]],
       imei_2: ['', [Validators.pattern(imeiPattern)]],
       mobile_brand: ['', [Validators.required]],
-      mobile_model: ['', [Validators.required, Validators.maxLength(150)]],
-      missing_date: ['', [Validators.required]],
-      missing_location: ['', [Validators.required]],
-      police_complaint_no: ['', [Validators.maxLength(100)]],
+      missing_date: ['', [Validators.required, this.futureDateValidator]],
       incident_description: [''],
       consent: [false, [Validators.requiredTrue]]
     });

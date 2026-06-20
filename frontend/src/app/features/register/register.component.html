@@ -210,48 +210,17 @@
               <span class="error-msg" *ngIf="serverErrors['mobile_brand']">{{ serverErrors['mobile_brand'] }}</span>
             </div>
 
-            <!-- Mobile Model -->
-            <div class="form-group" [class.has-error]="isInvalid('mobile_model') || serverErrors['mobile_model']">
-              <label for="mobile_model">{{ ts.t('model') }} <span class="required">*</span></label>
-              <div class="input-with-icon">
-                <span class="material-icons input-icon">phone_android</span>
-                <input type="text" id="mobile_model" formControlName="mobile_model" placeholder="e.g. Galaxy S24 Ultra">
-              </div>
-              <span class="error-msg" *ngIf="isInvalid('mobile_model')">{{ ts.t('val_required') }}</span>
-              <span class="error-msg" *ngIf="serverErrors['mobile_model']">{{ serverErrors['mobile_model'] }}</span>
-            </div>
-
             <!-- Missing Date -->
             <div class="form-group" [class.has-error]="isInvalid('missing_date') || serverErrors['missing_date']">
               <label for="missing_date">{{ ts.t('missing_date') }} <span class="required">*</span></label>
               <div class="input-with-icon">
                 <span class="material-icons input-icon">calendar_today</span>
-                <input type="date" id="missing_date" formControlName="missing_date">
+                <input type="date" id="missing_date" formControlName="missing_date" [max]="maxDate">
               </div>
-              <span class="error-msg" *ngIf="isInvalid('missing_date')">{{ ts.t('val_required') }}</span>
+              <span class="error-msg" *ngIf="isInvalid('missing_date') && registerForm.get('missing_date')?.hasError('required')">{{ ts.t('val_required') }}</span>
+              <span class="error-msg" *ngIf="isInvalid('missing_date') && registerForm.get('missing_date')?.hasError('futureDate')">{{ ts.t('val_future_date') }}</span>
               <span class="error-msg" *ngIf="serverErrors['missing_date']">{{ serverErrors['missing_date'] }}</span>
             </div>
-
-            <!-- Police Complaint No -->
-            <div class="form-group" [class.has-error]="isInvalid('police_complaint_no') || serverErrors['police_complaint_no']">
-              <label for="police_complaint_no">{{ ts.t('police_no') }}</label>
-              <div class="input-with-icon">
-                <span class="material-icons input-icon">policy</span>
-                <input type="text" id="police_complaint_no" formControlName="police_complaint_no" placeholder="e.g. CSR-12345/2026">
-              </div>
-              <span class="error-msg" *ngIf="serverErrors['police_complaint_no']">{{ serverErrors['police_complaint_no'] }}</span>
-            </div>
-          </div>
-
-          <!-- Missing Location -->
-          <div class="form-group full-width-field" [class.has-error]="isInvalid('missing_location') || serverErrors['missing_location']">
-            <label for="missing_location">{{ ts.t('missing_loc') }} <span class="required">*</span></label>
-            <div class="input-with-icon">
-              <span class="material-icons input-icon">place</span>
-              <input type="text" id="missing_location" formControlName="missing_location" placeholder="e.g. T Nagar Bus Terminus, Chennai">
-            </div>
-            <span class="error-msg" *ngIf="isInvalid('missing_location')">{{ ts.t('val_required') }}</span>
-            <span class="error-msg" *ngIf="serverErrors['missing_location']">{{ serverErrors['missing_location'] }}</span>
           </div>
 
           <!-- Incident Description -->
