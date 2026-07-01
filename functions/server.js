@@ -52,6 +52,54 @@ const initializeDatabase = async () => {
       await db.query('ALTER TABLE mobile_registrations ADD COLUMN IF NOT EXISTS instagram_id VARCHAR(150) NOT NULL DEFAULT \'\'');
     } catch (e) { console.error('Alter table error:', e); }
 
+    // Add column if table already exists without si_no
+    try {
+      await db.query('ALTER TABLE mobile_registrations ADD COLUMN IF NOT EXISTS si_no SERIAL UNIQUE');
+    } catch (e) { console.error('Alter table error:', e); }
+
+    // Add level_id and level_no columns
+    try {
+      await db.query('ALTER TABLE mobile_registrations ADD COLUMN IF NOT EXISTS level_id VARCHAR(50)');
+      await db.query('ALTER TABLE mobile_registrations ADD COLUMN IF NOT EXISTS level_no INT');
+    } catch (e) { console.error('Alter table columns error:', e); }
+
+    // Setup level data trigger and function
+    try {
+      await db.query(`
+        CREATE OR REPLACE FUNCTION set_level_data()
+        RETURNS TRIGGER AS $$
+        BEGIN
+          IF NEW.si_no IS NOT NULL THEN
+            NEW.level_no := CEIL(NEW.si_no::float / 100);
+            NEW.level_id := 'L' || NEW.level_no::text || '-' || (((NEW.si_no - 1) % 100) + 1)::text;
+          END IF;
+          RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+      `);
+      await db.query(`
+        DROP TRIGGER IF EXISTS trigger_set_level_data ON mobile_registrations;
+        CREATE TRIGGER trigger_set_level_data
+        BEFORE INSERT OR UPDATE OF si_no ON mobile_registrations
+        FOR EACH ROW
+        EXECUTE FUNCTION set_level_data();
+      `);
+    } catch (e) { console.error('Setup trigger error:', e); }
+
+    // Backfill existing rows that have empty level fields
+    try {
+      const backfillResult = await db.query(`
+        UPDATE mobile_registrations 
+        SET 
+          level_no = CEIL(si_no::float / 100),
+          level_id = 'L' || CEIL(si_no::float / 100)::text || '-' || (((si_no - 1) % 100) + 1)::text
+        WHERE level_id IS NULL OR level_no IS NULL
+      `);
+      if (backfillResult.rowCount > 0) {
+        console.log(`Migration: Backfilled level data for ${backfillResult.rowCount} rows.`);
+      }
+    } catch (e) { console.error('Backfill error:', e); }
+
     // Create Dynamic Configuration Settings Table
     await db.query(`
       CREATE TABLE IF NOT EXISTS app_settings (

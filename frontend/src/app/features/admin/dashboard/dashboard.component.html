@@ -18,10 +18,10 @@
 
 <main class="admin-main">
   <div class="container-fluid dashboard-container">
-    
+
     <!-- KPI Panel Section -->
     <section class="kpi-section grid gap-3 animate-fade-in">
-      
+
       <!-- Total -->
       <div class="kpi-card total">
         <div class="kpi-icon-box"><span class="material-icons">grid_view</span></div>
@@ -89,7 +89,7 @@
 
     <!-- Charts Data Visualisation Section -->
     <section class="charts-section grid gap-3 animate-fade-in" *ngIf="trendPoints.length > 0 || brandBars.length > 0">
-      
+
       <!-- Daily Trend Line/Area Chart -->
       <div class="chart-card card trend-chart">
         <div class="chart-header d-flex justify-between align-center">
@@ -106,76 +106,61 @@
             <strong class="trend-count-val">{{ trendPoints[trendPoints.length - 1].count }} Cases</strong>
           </div>
         </div>
-        
+
         <div class="chart-body">
           <div class="svg-container">
             <svg viewBox="0 0 500 200" width="100%" height="100%" preserveAspectRatio="none">
               <!-- Defs for Gradients -->
               <defs>
                 <linearGradient id="trendAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.3"/>
-                  <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0"/>
+                  <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.3" />
+                  <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0" />
                 </linearGradient>
                 <linearGradient id="trendLineGradient" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#3B82F6"/>
-                  <stop offset="50%" stop-color="#8B5CF6"/>
-                  <stop offset="100%" stop-color="#EC4899"/>
+                  <stop offset="0%" stop-color="#3B82F6" />
+                  <stop offset="50%" stop-color="#8B5CF6" />
+                  <stop offset="100%" stop-color="#EC4899" />
                 </linearGradient>
               </defs>
 
               <!-- Gridlines -->
               <g class="chart-gridlines">
-                <line *ngFor="let tick of trendYTicks" x1="40" [attr.y1]="tick.y" x2="480" [attr.y2]="tick.y" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4,4"></line>
+                <line *ngFor="let tick of trendYTicks" x1="40" [attr.y1]="tick.y" x2="480" [attr.y2]="tick.y"
+                  stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4,4"></line>
               </g>
 
               <!-- Area Fill -->
               <path [attr.d]="trendAreaPath" fill="url(#trendAreaGradient)"></path>
 
               <!-- Line Path -->
-              <path [attr.d]="trendLinePath" fill="none" stroke="url(#trendLineGradient)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path [attr.d]="trendLinePath" fill="none" stroke="url(#trendLineGradient)" stroke-width="3.5"
+                stroke-linecap="round" stroke-linejoin="round"></path>
 
               <!-- Hover Guides & Interactive Circles -->
               <g class="chart-markers">
-                <circle 
-                  *ngFor="let p of trendPoints" 
-                  [attr.cx]="p.x" 
-                  [attr.cy]="p.y" 
-                  r="4.5" 
-                  [attr.fill]="hoveredPoint === p ? '#EC4899' : '#3B82F6'" 
-                  stroke="#FFFFFF" 
-                  stroke-width="1.5"
-                  class="chart-dot"
-                  [class.active]="hoveredPoint === p">
+                <circle *ngFor="let p of trendPoints" [attr.cx]="p.x" [attr.cy]="p.y" r="4.5"
+                  [attr.fill]="hoveredPoint === p ? '#EC4899' : '#3B82F6'" stroke="#FFFFFF" stroke-width="1.5"
+                  class="chart-dot" [class.active]="hoveredPoint === p">
                 </circle>
               </g>
 
               <!-- Invisible hover detection areas (Vertical slivers for easy hover) -->
               <g class="chart-hover-regions">
-                <rect 
-                  *ngFor="let p of trendPoints; let idx = index"
-                  [attr.x]="p.x - 15"
-                  y="20"
-                  width="30"
-                  height="150"
-                  fill="transparent"
-                  style="cursor: pointer;"
-                  (mouseenter)="hoveredPoint = p"
+                <rect *ngFor="let p of trendPoints; let idx = index" [attr.x]="p.x - 15" y="20" width="30" height="150"
+                  fill="transparent" style="cursor: pointer;" (mouseenter)="hoveredPoint = p"
                   (mouseleave)="hoveredPoint = null">
                 </rect>
               </g>
 
               <!-- Axes Text Labels -->
               <!-- Y Axis Counts -->
-              <text *ngFor="let tick of trendYTicks" x="30" [attr.y]="tick.y + 4" class="axis-text text-right" text-anchor="end">{{ tick.val }}</text>
-              
+              <text *ngFor="let tick of trendYTicks" x="30" [attr.y]="tick.y + 4" class="axis-text text-right"
+                text-anchor="end">{{ tick.val }}</text>
+
               <!-- X Axis Dates (Skip intermediate labels for clean spacing) -->
               <g class="x-axis-labels">
                 <ng-container *ngFor="let p of trendPoints; let idx = index">
-                  <text 
-                    [attr.x]="p.x" 
-                    y="190" 
-                    class="axis-text text-center" 
-                    text-anchor="middle"
+                  <text [attr.x]="p.x" y="190" class="axis-text text-center" text-anchor="middle"
                     *ngIf="idx % 2 === 0 || idx === trendPoints.length - 1">
                     {{ p.label }}
                   </text>
@@ -209,49 +194,39 @@
               <!-- Defs for Bar Gradients -->
               <defs>
                 <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#10B981"/>
-                  <stop offset="100%" stop-color="#059669"/>
+                  <stop offset="0%" stop-color="#10B981" />
+                  <stop offset="100%" stop-color="#059669" />
                 </linearGradient>
                 <linearGradient id="barHoverGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#34D399"/>
-                  <stop offset="100%" stop-color="#10B981"/>
+                  <stop offset="0%" stop-color="#34D399" />
+                  <stop offset="100%" stop-color="#10B981" />
                 </linearGradient>
               </defs>
 
               <!-- Gridlines -->
               <g class="chart-gridlines">
-                <line *ngFor="let tick of brandYTicks" x1="40" [attr.y1]="tick.y" x2="480" [attr.y2]="tick.y" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4,4"></line>
+                <line *ngFor="let tick of brandYTicks" x1="40" [attr.y1]="tick.y" x2="480" [attr.y2]="tick.y"
+                  stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4,4"></line>
               </g>
 
               <!-- Bar Rectangles -->
               <g class="chart-bars">
-                <rect 
-                  *ngFor="let bar of brandBars" 
-                  [attr.x]="bar.x" 
-                  [attr.y]="bar.y" 
-                  [attr.width]="bar.width" 
-                  [attr.height]="bar.height" 
-                  [attr.fill]="hoveredBar === bar ? 'url(#barHoverGradient)' : 'url(#barGradient)'"
-                  rx="4"
-                  ry="4"
-                  class="chart-bar"
-                  (mouseenter)="hoveredBar = bar"
-                  (mouseleave)="hoveredBar = null"
+                <rect *ngFor="let bar of brandBars" [attr.x]="bar.x" [attr.y]="bar.y" [attr.width]="bar.width"
+                  [attr.height]="bar.height"
+                  [attr.fill]="hoveredBar === bar ? 'url(#barHoverGradient)' : 'url(#barGradient)'" rx="4" ry="4"
+                  class="chart-bar" (mouseenter)="hoveredBar = bar" (mouseleave)="hoveredBar = null"
                   style="cursor: pointer; transition: all 0.2s ease;">
                 </rect>
               </g>
 
               <!-- Y Axis Counts -->
-              <text *ngFor="let tick of brandYTicks" x="30" [attr.y]="tick.y + 4" class="axis-text text-right" text-anchor="end">{{ tick.val }}</text>
+              <text *ngFor="let tick of brandYTicks" x="30" [attr.y]="tick.y + 4" class="axis-text text-right"
+                text-anchor="end">{{ tick.val }}</text>
 
               <!-- X Axis Labels (Brands) -->
               <g class="x-axis-labels">
-                <text 
-                  *ngFor="let bar of brandBars" 
-                  [attr.x]="bar.labelX" 
-                  y="190" 
-                  class="axis-text text-center text-brand-label" 
-                  text-anchor="middle">
+                <text *ngFor="let bar of brandBars" [attr.x]="bar.labelX" y="190"
+                  class="axis-text text-center text-brand-label" text-anchor="middle">
                   {{ bar.brand }}
                 </text>
               </g>
@@ -265,17 +240,13 @@
     <!-- Filters and Searches Controls -->
     <section class="controls-section card animate-fade-in">
       <div class="filters-grid grid gap-3">
-        
+
         <!-- Search -->
         <div class="control-group">
           <label for="search">Search</label>
           <div class="search-box">
             <span class="material-icons search-icon">search</span>
-            <input 
-              type="text" 
-              id="search" 
-              [(ngModel)]="search" 
-              placeholder="Search Name, Phone, IMEI..." 
+            <input type="text" id="search" [(ngModel)]="search" placeholder="Search Name, Phone, IMEI..."
               (keyup.enter)="onApplyFilters()">
           </div>
         </div>
@@ -321,7 +292,7 @@
             <span class="material-icons">restart_alt</span> Clear Filters
           </button>
         </div>
-        
+
         <div class="export-btns d-flex gap-2">
           <button class="btn btn-secondary btn-sm" (click)="exportExcel()">
             <span class="material-icons">table_view</span> Export XLSX
@@ -339,50 +310,65 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th (click)="onSort('id')" [class.sorted]="sortField === 'id'">
-                ID <span class="material-icons sort-arrow">{{ sortField === 'id' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+              <th (click)="onSort('si_no')" [class.sorted]="sortField === 'si_no'">
+                S.No <span class="material-icons sort-arrow">{{ sortField === 'si_no' ? (sortOrder === 'ASC' ?
+                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+              </th>
+              <th (click)="onSort('si_no')" [class.sorted]="sortField === 'si_no'">
+                Level ID <span class="material-icons sort-arrow">{{ sortField === 'si_no' ? (sortOrder === 'ASC' ?
+                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
               <th (click)="onSort('name')" [class.sorted]="sortField === 'name'">
-                Name <span class="material-icons sort-arrow">{{ sortField === 'name' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+                Name <span class="material-icons sort-arrow">{{ sortField === 'name' ? (sortOrder === 'ASC' ?
+                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
               <th (click)="onSort('mobile_number')" [class.sorted]="sortField === 'mobile_number'">
-                Mobile <span class="material-icons sort-arrow">{{ sortField === 'mobile_number' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+                Mobile <span class="material-icons sort-arrow">{{ sortField === 'mobile_number' ? (sortOrder === 'ASC' ?
+                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
               <th>Alternative Mobile</th>
               <th>Instagram ID</th>
               <th (click)="onSort('imei_1')" [class.sorted]="sortField === 'imei_1'">
-                IMEI 1 <span class="material-icons sort-arrow">{{ sortField === 'imei_1' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+                IMEI 1 <span class="material-icons sort-arrow">{{ sortField === 'imei_1' ? (sortOrder === 'ASC' ?
+                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
               <th>IMEI 2</th>
               <th (click)="onSort('mobile_brand')" [class.sorted]="sortField === 'mobile_brand'">
-                Brand <span class="material-icons sort-arrow">{{ sortField === 'mobile_brand' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+                Brand <span class="material-icons sort-arrow">{{ sortField === 'mobile_brand' ? (sortOrder === 'ASC' ?
+                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
               <th (click)="onSort('missing_date')" [class.sorted]="sortField === 'missing_date'">
-                Missing Date <span class="material-icons sort-arrow">{{ sortField === 'missing_date' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+                Missing Date <span class="material-icons sort-arrow">{{ sortField === 'missing_date' ? (sortOrder ===
+                  'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
               <th (click)="onSort('status')" [class.sorted]="sortField === 'status'">
-                Status <span class="material-icons sort-arrow">{{ sortField === 'status' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+                Status <span class="material-icons sort-arrow">{{ sortField === 'status' ? (sortOrder === 'ASC' ?
+                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
               <th (click)="onSort('created_at')" [class.sorted]="sortField === 'created_at'">
-                Registered Date <span class="material-icons sort-arrow">{{ sortField === 'created_at' ? (sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
+                Registered Date <span class="material-icons sort-arrow">{{ sortField === 'created_at' ? (sortOrder ===
+                  'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
               </th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let reg of registrations" (click)="openDetails(reg)" class="clickable-row">
-              <td class="text-truncate" [title]="reg.id">{{ reg.id }}</td>
+              <td>{{ reg.si_no || '-' }}</td>
+              <td class="font-bold">{{ reg.level_id || '-' }}</td>
               <td class="font-bold">{{ reg.name }}</td>
               <td>{{ reg.mobile_number }}</td>
               <td>{{ reg.alternative_mobile_number || '-' }}</td>
               <td>
-                <a *ngIf="reg.instagram_id" [href]="'https://instagram.com/' + reg.instagram_id" target="_blank" class="insta-link">
-                  <span class="material-icons" style="font-size: 14px; vertical-align: middle;">camera_alt</span> {{ reg.instagram_id }}
+                <a *ngIf="reg.instagram_id" [href]="'https://instagram.com/' + reg.instagram_id" target="_blank"
+                  class="insta-link">
+                  <span class="material-icons" style="font-size: 14px; vertical-align: middle;">camera_alt</span> {{
+                  reg.instagram_id }}
                 </a>
                 <span *ngIf="!reg.instagram_id">-</span>
               </td>
               <td>{{ reg.imei_1 }}</td>
               <td>{{ reg.imei_2 || '-' }}</td>
-               <td>{{ reg.mobile_brand }}</td>
+              <td>{{ reg.mobile_brand }}</td>
               <td>{{ reg.missing_date | date:'yyyy-MM-dd' }}</td>
               <td>
                 <span class="status-pill" [class]="reg.status.toLowerCase().replace(' ', '-')">
@@ -392,7 +378,7 @@
               <td>{{ reg.created_at | date:'yyyy-MM-dd HH:mm' }}</td>
             </tr>
             <tr *ngIf="registrations.length === 0">
-              <td colspan="11" class="no-records text-center">
+              <td colspan="12" class="no-records text-center">
                 <span class="material-icons">info_outline</span>
                 <p>No registrations match the query parameters.</p>
               </td>
@@ -404,29 +390,26 @@
       <!-- Pagination node -->
       <div class="pagination-container d-flex justify-between align-center" *ngIf="totalCount > 0">
         <div class="pagination-info">
-          Showing {{ (page - 1) * limit + 1 }} to {{ page * limit > totalCount ? totalCount : page * limit }} of {{ totalCount }} records
+          Showing {{ (page - 1) * limit + 1 }} to {{ page * limit > totalCount ? totalCount : page * limit }} of {{
+          totalCount }} records
         </div>
-        
+
         <div class="pagination-controls d-flex align-center gap-1">
-          <button 
-            class="btn-pagination" 
-            [disabled]="page === 1" 
-            (click)="goToPage(page - 1)">
+          <button class="btn-pagination" [disabled]="page === 1" (click)="goToPage(page - 1)">
             <span class="material-icons">chevron_left</span>
           </button>
-          
-          <button 
-            *ngFor="let p of pagesArray" 
-            class="btn-pagination" 
-            [class.active]="page === p" 
-            (click)="goToPage(p)">
-            {{ p }}
-          </button>
-          
-          <button 
-            class="btn-pagination" 
-            [disabled]="page === pagesArray.length" 
-            (click)="goToPage(page + 1)">
+
+          <ng-container *ngFor="let p of visiblePages">
+            <button *ngIf="p !== '...'; else dots" class="btn-pagination" [class.active]="page === p"
+              (click)="goToPage(p)">
+              {{ p }}
+            </button>
+            <ng-template #dots>
+              <span class="pagination-dots">...</span>
+            </ng-template>
+          </ng-container>
+
+          <button class="btn-pagination" [disabled]="page === pagesArray.length" (click)="goToPage(page + 1)">
             <span class="material-icons">chevron_right</span>
           </button>
         </div>
@@ -448,17 +431,14 @@
       <h3>Case Registration Details</h3>
       <button class="btn-close" (click)="closeDetails()"><span class="material-icons">close</span></button>
     </div>
-    
+
     <div class="drawer-body" *ngIf="selectedRegistration">
-      
+
       <!-- Status Modifier -->
       <div class="detail-section status-modifier-section bg-grey card">
         <label for="updateStatusField">Update Recovery Case Status</label>
-        <select 
-          id="updateStatusField" 
-          [value]="selectedRegistration.status" 
-          (change)="onUpdateStatus(statusSelect.value)" 
-          #statusSelect>
+        <select id="updateStatusField" [value]="selectedRegistration.status"
+          (change)="onUpdateStatus(statusSelect.value)" #statusSelect>
           <option *ngFor="let stat of statuses" [value]="stat">{{ stat }}</option>
         </select>
       </div>
@@ -467,6 +447,14 @@
       <div class="detail-section">
         <h4><span class="material-icons detail-sec-icon">person</span> Owner Personal Information</h4>
         <table class="detail-table">
+          <tr>
+            <th>S.No</th>
+            <td class="font-bold">{{ selectedRegistration.si_no || '-' }}</td>
+          </tr>
+          <tr>
+            <th>Level ID</th>
+            <td class="font-bold text-blue">{{ selectedRegistration.level_id || '-' }}</td>
+          </tr>
           <tr>
             <th>Name</th>
             <td>{{ selectedRegistration.name }}</td>
@@ -486,8 +474,11 @@
           <tr>
             <th>Instagram ID</th>
             <td>
-              <a *ngIf="selectedRegistration.instagram_id" [href]="'https://instagram.com/' + selectedRegistration.instagram_id" target="_blank" class="insta-link">
-                <span class="material-icons" style="font-size: 16px; vertical-align: middle;">camera_alt</span> {{ '@' + selectedRegistration.instagram_id }}
+              <a *ngIf="selectedRegistration.instagram_id"
+                [href]="'https://instagram.com/' + selectedRegistration.instagram_id" target="_blank"
+                class="insta-link">
+                <span class="material-icons" style="font-size: 16px; vertical-align: middle;">camera_alt</span> {{ '@' +
+                selectedRegistration.instagram_id }}
               </a>
               <span *ngIf="!selectedRegistration.instagram_id">N/A</span>
             </td>
@@ -528,7 +519,7 @@
       <div class="detail-section documents-section">
         <h4><span class="material-icons detail-sec-icon">attachment</span> Uploaded Verification Proofs</h4>
         <div class="doc-links grid gap-2">
-          
+
           <!-- Invoice File -->
           <div class="doc-card d-flex justify-between align-center" *ngIf="selectedRegistration.invoice_file">
             <div class="d-flex align-center gap-2">
@@ -538,7 +529,8 @@
                 <p>Verify phone ownership proof</p>
               </div>
             </div>
-            <a [href]="'/uploads/' + selectedRegistration.invoice_file" target="_blank" class="btn btn-secondary btn-sm">
+            <a [href]="'/uploads/' + selectedRegistration.invoice_file" target="_blank"
+              class="btn btn-secondary btn-sm">
               <span class="material-icons">visibility</span> View File
             </a>
           </div>
@@ -552,7 +544,8 @@
                 <p>Reference photo of the mobile</p>
               </div>
             </div>
-            <a [href]="'/uploads/' + selectedRegistration.mobile_photo" target="_blank" class="btn btn-secondary btn-sm">
+            <a [href]="'/uploads/' + selectedRegistration.mobile_photo" target="_blank"
+              class="btn btn-secondary btn-sm">
               <span class="material-icons">visibility</span> View File
             </a>
           </div>
@@ -585,22 +578,20 @@
       <h3>Dynamic configurations</h3>
       <button class="btn-close" (click)="closeSettings()"><span class="material-icons">close</span></button>
     </div>
-    
+
     <div class="modal-body">
       <div class="form-group">
         <label for="instaUsername">Configured Instagram Feed Account</label>
         <div class="input-with-icon">
           <span class="material-icons input-icon">camera_alt</span>
-          <input 
-            type="text" 
-            id="instaUsername" 
-            [(ngModel)]="newInstagramUsername" 
+          <input type="text" id="instaUsername" [(ngModel)]="newInstagramUsername"
             placeholder="Enter public username (e.g. godofmobiles)">
         </div>
-        <p class="helper-text">This username dictates the profile links and mockup items loaded on the website landing page.</p>
+        <p class="helper-text">This username dictates the profile links and mockup items loaded on the website landing
+          page.</p>
       </div>
     </div>
-    
+
     <div class="modal-footer d-flex justify-end gap-2">
       <button class="btn btn-outline btn-sm" (click)="closeSettings()">Cancel</button>
       <button class="btn btn-primary btn-sm" (click)="saveSettings()" [disabled]="isSavingSettings">

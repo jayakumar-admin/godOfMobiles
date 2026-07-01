@@ -29,7 +29,7 @@ export class DashboardComponent implements OnInit {
   trendLinePath = '';
   trendAreaPath = '';
   trendYTicks: any[] = [];
-  
+
   brandBars: any[] = [];
   brandYTicks: any[] = [];
 
@@ -40,6 +40,7 @@ export class DashboardComponent implements OnInit {
   registrations: any[] = [];
   totalCount = 0;
   pagesArray: number[] = [];
+  visiblePages: (number | string)[] = [];
 
   // Active Query Parameters
   search = '';
@@ -50,12 +51,12 @@ export class DashboardComponent implements OnInit {
   sortField = 'created_at';
   sortOrder = 'DESC';
   page = 1;
-  limit = 10;
+  limit = 1000;
 
   // Modals & Panels Control
   selectedRegistration: any = null;
   showDetailsDrawer = false;
-  
+
   showSettingsModal = false;
   instagramUsername = 'godofmobiles';
   newInstagramUsername = '';
@@ -63,8 +64,8 @@ export class DashboardComponent implements OnInit {
 
   // Brand dropdown options
   brands = [
-    'Samsung', 'Apple', 'Vivo', 'Oppo', 'Redmi', 
-    'Realme', 'Nokia', 'Motorola', 'OnePlus', 
+    'Samsung', 'Apple', 'Vivo', 'Oppo', 'Redmi',
+    'Realme', 'Nokia', 'Motorola', 'OnePlus',
     'Google Pixel', 'Other'
   ];
 
@@ -74,7 +75,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadDashboardData();
@@ -233,6 +234,48 @@ export class DashboardComponent implements OnInit {
 
   updatePagesArray(totalPages: number) {
     this.pagesArray = Array.from({ length: totalPages }, (_, i) => i + 1);
+    
+    const pages: (number | string)[] = [];
+    const current = this.page;
+    const total = totalPages;
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show page 1
+      pages.push(1);
+
+      if (current > 4) {
+        pages.push('...');
+      }
+
+      // Middle pages range
+      const start = Math.max(2, current - 2);
+      const end = Math.min(total - 1, current + 2);
+
+      let adjustedStart = start;
+      let adjustedEnd = end;
+      if (current <= 4) {
+        adjustedEnd = 5;
+      }
+      if (current >= total - 3) {
+        adjustedStart = total - 4;
+      }
+
+      for (let i = adjustedStart; i <= adjustedEnd; i++) {
+        pages.push(i);
+      }
+
+      if (current < total - 3) {
+        pages.push('...');
+      }
+
+      // Always show last page
+      pages.push(total);
+    }
+    this.visiblePages = pages;
   }
 
   // Filters Handlers
@@ -264,9 +307,10 @@ export class DashboardComponent implements OnInit {
   }
 
   // Pagination
-  goToPage(pageNum: number) {
-    if (pageNum >= 1 && pageNum <= this.pagesArray.length) {
-      this.page = pageNum;
+  goToPage(pageNum: number | string) {
+    const pageInt = typeof pageNum === 'string' ? parseInt(pageNum, 10) : pageNum;
+    if (!isNaN(pageInt) && pageInt >= 1 && pageInt <= this.pagesArray.length) {
+      this.page = pageInt;
       this.loadRegistrations();
     }
   }
@@ -294,7 +338,7 @@ export class DashboardComponent implements OnInit {
   // Status management dropdown
   onUpdateStatus(newStatus: string) {
     if (!this.selectedRegistration) return;
-    
+
     const id = this.selectedRegistration.id;
     this.adminService.updateStatus(id, newStatus).subscribe({
       next: (res) => {
