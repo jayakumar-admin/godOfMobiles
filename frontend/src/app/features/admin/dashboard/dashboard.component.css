@@ -998,8 +998,12 @@
     color: var(--accent);
 }
 
-.brand-chart .chart-title-icon {
-    color: #10B981;
+.text-indigo {
+    color: #6366f1 !important;
+}
+
+.text-emerald {
+    color: #10b981 !important;
 }
 
 .chart-card h4 {

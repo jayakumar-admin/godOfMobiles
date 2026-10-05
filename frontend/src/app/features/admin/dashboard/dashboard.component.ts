@@ -29,12 +29,37 @@ export class DashboardComponent implements OnInit {
   trendLinePath = '';
   trendAreaPath = '';
   trendYTicks: any[] = [];
+  latestTrendLabel = '';
+  latestTrendCount = 0;
 
   brandBars: any[] = [];
   brandYTicks: any[] = [];
+  leadingBrandLabel = '';
+  leadingBrandCount = 0;
 
   hoveredPoint: any = null;
   hoveredBar: any = null;
+
+  getSmoothLinePath(points: { x: number; y: number }[]): string {
+    if (!points || points.length === 0) return '';
+    if (points.length === 1) return `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+
+    let path = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i === 0 ? i : i - 1];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[i + 2 < points.length ? i + 2 : i + 1];
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+      path += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+    }
+    return path;
+  }
 
   // Data Listing & Table Specs
   registrations: any[] = [];
@@ -44,6 +69,7 @@ export class DashboardComponent implements OnInit {
 
   // Active Query Parameters
   search = '';
+  activeSearch = '';
   brandFilter = '';
   statusFilter = '';
   startDate = '';
@@ -131,12 +157,20 @@ export class DashboardComponent implements OnInit {
       return { date, count, label };
     });
 
-    const viewBoxWidth = 500;
-    const viewBoxHeight = 200;
-    const paddingLeft = 40;
+    if (filledTrend.length > 0) {
+      this.latestTrendLabel = filledTrend[filledTrend.length - 1].label;
+      this.latestTrendCount = filledTrend[filledTrend.length - 1].count;
+    } else {
+      this.latestTrendLabel = '';
+      this.latestTrendCount = 0;
+    }
+
+    const viewBoxWidth = 520;
+    const viewBoxHeight = 240;
+    const paddingLeft = 45;
     const paddingRight = 20;
-    const paddingTop = 20;
-    const paddingBottom = 30;
+    const paddingTop = 40;
+    const paddingBottom = 40;
     const chartWidth = viewBoxWidth - paddingLeft - paddingRight;
     const chartHeight = viewBoxHeight - paddingTop - paddingBottom;
 
@@ -153,12 +187,13 @@ export class DashboardComponent implements OnInit {
     }
 
     this.trendPoints = filledTrend.map((item, i) => {
-      const x = paddingLeft + (i / (filledTrend.length - 1)) * chartWidth;
+      const x = paddingLeft + (i / Math.max(filledTrend.length - 1, 1)) * chartWidth;
       const y = paddingTop + chartHeight - (item.count / maxCount) * chartHeight;
-      return { x, y, ...item };
+      const pointRatio = maxCount > 0 ? item.count / maxCount : 0;
+      return { x, y, pointRatio, ...item };
     });
 
-    this.trendLinePath = this.trendPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ');
+    this.trendLinePath = this.getSmoothLinePath(this.trendPoints);
     this.trendAreaPath = this.trendLinePath ? `${this.trendLinePath} L ${this.trendPoints[this.trendPoints.length - 1].x.toFixed(1)} ${(paddingTop + chartHeight).toFixed(1)} L ${this.trendPoints[0].x.toFixed(1)} ${(paddingTop + chartHeight).toFixed(1)} Z` : '';
 
     // 2. Process Brand Distribution Bar Chart
@@ -177,6 +212,14 @@ export class DashboardComponent implements OnInit {
 
     topBrands.sort((a: any, b: any) => b.count - a.count);
 
+    if (topBrands.length > 0) {
+      this.leadingBrandLabel = topBrands[0].brand.toUpperCase();
+      this.leadingBrandCount = topBrands[0].count;
+    } else {
+      this.leadingBrandLabel = '';
+      this.leadingBrandCount = 0;
+    }
+
     let maxBrandCount = Math.max(...topBrands.map((b: any) => b.count));
     if (maxBrandCount === 0) maxBrandCount = 5;
 
@@ -189,22 +232,48 @@ export class DashboardComponent implements OnInit {
     }
 
     const N = topBrands.length;
-    const barSpacing = N > 5 ? 15 : 25;
+    const barSpacing = N > 5 ? 18 : 28;
     const totalSpacings = (N - 1) * barSpacing;
     const barWidth = (chartWidth - totalSpacings) / N;
+
+    // Rich dynamic gradient palettes ordered by count intensity ratio
+    const gradientPalettes = [
+      { start: '#10b981', middle: '#059669', stop: '#047857', topText: '#065f46' }, // Emerald / Green (Highest / Leader)
+      { start: '#06b6d4', middle: '#0284c7', stop: '#0369a1', topText: '#0c4a6e' }, // Cyan / Blue (Very High)
+      { start: '#6366f1', middle: '#4f46e5', stop: '#3730a3', topText: '#312e81' }, // Indigo / Cobalt (High)
+      { start: '#8b5cf6', middle: '#7c3aed', stop: '#5b21b6', topText: '#4c1d95' }, // Violet / Purple (Medium)
+      { start: '#f59e0b', middle: '#d97706', stop: '#92400e', topText: '#78350f' }, // Amber / Golden (Low-Medium)
+      { start: '#64748b', middle: '#475569', stop: '#1e293b', topText: '#0f172a' }  // Slate / Charcoal (Lowest)
+    ];
 
     this.brandBars = topBrands.map((item: any, i: number) => {
       const x = paddingLeft + i * (barWidth + barSpacing);
       const barValHeight = (item.count / maxBrandCount) * chartHeight;
       const y = paddingTop + chartHeight - barValHeight;
+      const ratio = maxBrandCount > 0 ? item.count / maxBrandCount : 0;
+
+      // Select gradient based on count comparison ratio & rank order
+      let palette = gradientPalettes[Math.min(i, gradientPalettes.length - 1)];
+      if (ratio >= 0.80) palette = gradientPalettes[0];
+      else if (ratio >= 0.60) palette = gradientPalettes[1];
+      else if (ratio >= 0.40) palette = gradientPalettes[2];
+      else if (ratio >= 0.25) palette = gradientPalettes[3];
+      else if (ratio >= 0.12) palette = gradientPalettes[4];
+      else palette = gradientPalettes[5];
+
       return {
         brand: item.brand,
         count: item.count,
         x,
         y,
         width: barWidth,
-        height: Math.max(barValHeight, 2),
-        labelX: x + barWidth / 2
+        height: Math.max(barValHeight, 4),
+        labelX: x + barWidth / 2,
+        colorStart: palette.start,
+        colorMiddle: palette.middle,
+        colorStop: palette.stop,
+        topTextColor: palette.topText,
+        ratio
       };
     });
   }
@@ -213,7 +282,7 @@ export class DashboardComponent implements OnInit {
     const filters = {
       page: this.page,
       limit: this.limit,
-      search: this.search,
+      search: this.activeSearch,
       brand: this.brandFilter,
       status: this.statusFilter,
       startDate: this.startDate,
@@ -286,12 +355,14 @@ export class DashboardComponent implements OnInit {
 
   // Filters Handlers
   onSearch() {
+    this.activeSearch = this.search.trim();
     this.page = 1;
     this.loadRegistrations();
   }
 
   resetFilters() {
     this.search = '';
+    this.activeSearch = '';
     this.brandFilter = '';
     this.statusFilter = '';
     this.startDate = '';
@@ -465,7 +536,7 @@ export class DashboardComponent implements OnInit {
   // Exporters
   exportExcel() {
     const filters = {
-      search: this.search,
+      search: this.activeSearch,
       brand: this.brandFilter,
       status: this.statusFilter,
       startDate: this.startDate,
@@ -475,18 +546,46 @@ export class DashboardComponent implements OnInit {
     };
 
     this.adminService.exportExcel(filters).subscribe({
-      next: (blob) => {
+      next: (blob: Blob) => {
+        if (blob.type === 'application/json' || blob.type.includes('json')) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const res = JSON.parse(reader.result as string);
+              this.showNotification(res.message || 'Failed to export Excel file', 'error');
+            } catch (e) {
+              this.showNotification('Failed to export Excel file', 'error');
+            }
+          };
+          reader.readAsText(blob);
+          return;
+        }
         this.downloadBlob(blob, `registrations_export_${Date.now()}.xlsx`);
+        this.showNotification('Excel sheet downloaded successfully!', 'success');
       },
       error: (err) => {
         console.error('Error exporting Excel:', err);
+        if (err.error instanceof Blob) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const res = JSON.parse(reader.result as string);
+              this.showNotification(res.message || 'Failed to export Excel file', 'error');
+            } catch (e) {
+              this.showNotification('Failed to export Excel file', 'error');
+            }
+          };
+          reader.readAsText(err.error);
+        } else {
+          this.showNotification(err.error?.message || 'Failed to export Excel file', 'error');
+        }
       }
     });
   }
 
   exportCSV() {
     const filters = {
-      search: this.search,
+      search: this.activeSearch,
       brand: this.brandFilter,
       status: this.statusFilter,
       startDate: this.startDate,
@@ -496,11 +595,39 @@ export class DashboardComponent implements OnInit {
     };
 
     this.adminService.exportCSV(filters).subscribe({
-      next: (blob) => {
+      next: (blob: Blob) => {
+        if (blob.type === 'application/json' || blob.type.includes('json')) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const res = JSON.parse(reader.result as string);
+              this.showNotification(res.message || 'Failed to export CSV file', 'error');
+            } catch (e) {
+              this.showNotification('Failed to export CSV file', 'error');
+            }
+          };
+          reader.readAsText(blob);
+          return;
+        }
         this.downloadBlob(blob, `registrations_export_${Date.now()}.csv`);
+        this.showNotification('CSV file downloaded successfully!', 'success');
       },
       error: (err) => {
         console.error('Error exporting CSV:', err);
+        if (err.error instanceof Blob) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const res = JSON.parse(reader.result as string);
+              this.showNotification(res.message || 'Failed to export CSV file', 'error');
+            } catch (e) {
+              this.showNotification('Failed to export CSV file', 'error');
+            }
+          };
+          reader.readAsText(err.error);
+        } else {
+          this.showNotification(err.error?.message || 'Failed to export CSV file', 'error');
+        }
       }
     });
   }

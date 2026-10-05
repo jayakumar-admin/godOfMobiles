@@ -112,29 +112,43 @@
         <div class="chart-card card trend-chart">
           <div class="chart-header d-flex justify-between align-center">
             <div class="chart-title-box">
-              <h4><span class="material-icons chart-title-icon">trending_up</span> Registration Trend</h4>
+              <h4>
+                <span class="material-icons chart-title-icon text-indigo">trending_up</span> 
+                Registration Trend
+              </h4>
               <p class="chart-subtitle">Daily registered devices (last 14 days)</p>
             </div>
-            <div class="chart-summary-number" *ngIf="hoveredPoint">
-              <span class="summary-val">{{ hoveredPoint.count }}</span>
-              <span class="summary-date">{{ hoveredPoint.date }}</span>
+            <div class="chart-summary-number">
+              <span class="trend-date-label">
+                {{ hoveredPoint ? ('DATE: ' + hoveredPoint.label) : ('LATEST: ' + (latestTrendLabel || '')) }}
+              </span>
+              <span class="trend-count-val">
+                {{ ((hoveredPoint ? hoveredPoint.count : latestTrendCount) | number) }} Cases
+              </span>
             </div>
           </div>
           <div class="svg-container">
-            <svg viewBox="0 0 500 200" preserveAspectRatio="none" class="chart-svg">
-              <line *ngFor="let tick of trendYTicks" x1="40" [attr.y1]="tick.y" x2="490" [attr.y2]="tick.y" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4 4" />
-              <text *ngFor="let tick of trendYTicks" x="32" [attr.y]="tick.y + 4" text-anchor="end" fill="#9ca3af" font-size="10">{{ tick.val }}</text>
-              <path [attr.d]="trendAreaPath" fill="url(#trendGradient)" opacity="0.4" />
-              <path [attr.d]="trendLinePath" fill="none" stroke="#e11d48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-              <g *ngFor="let pt of trendPoints">
-                <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="4" fill="#e11d48" stroke="#111827" stroke-width="2" class="chart-dot" (mouseenter)="hoveredPoint = pt" (mouseleave)="hoveredPoint = null" />
-              </g>
+            <svg viewBox="0 0 520 240" preserveAspectRatio="none" class="chart-svg">
               <defs>
                 <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#e11d48" stop-opacity="0.8" />
-                  <stop offset="100%" stop-color="#e11d48" stop-opacity="0.0" />
+                  <stop offset="0%" stop-color="#6366f1" stop-opacity="0.32" />
+                  <stop offset="60%" stop-color="#8b5cf6" stop-opacity="0.12" />
+                  <stop offset="100%" stop-color="#6366f1" stop-opacity="0.0" />
                 </linearGradient>
               </defs>
+              <!-- Dotted Horizontal Gridlines -->
+              <line *ngFor="let tick of trendYTicks" x1="45" [attr.y1]="tick.y" x2="510" [attr.y2]="tick.y" stroke="#f1f5f9" stroke-dasharray="3 3" stroke-width="1" />
+              <!-- Y-Axis Ticks -->
+              <text *ngFor="let tick of trendYTicks" x="36" [attr.y]="tick.y + 4" text-anchor="end" fill="#94a3b8" font-size="10" font-weight="600">{{ tick.val }}</text>
+              <!-- Gradient Area -->
+              <path [attr.d]="trendAreaPath" fill="url(#trendGradient)" />
+              <!-- Smooth Curved Line -->
+              <path [attr.d]="trendLinePath" fill="none" stroke="#6366f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              <!-- Data Points & X Labels -->
+              <g *ngFor="let pt of trendPoints">
+                <circle [attr.cx]="pt.x" [attr.cy]="pt.y" [attr.r]="pt.pointRatio > 0.8 ? 5.5 : 4" [attr.fill]="pt.pointRatio > 0.8 ? '#4f46e5' : '#6366f1'" stroke="#ffffff" stroke-width="2" class="chart-dot" (mouseenter)="hoveredPoint = pt" (mouseleave)="hoveredPoint = null" />
+                <text [attr.x]="pt.x" y="222" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="600">{{ pt.label }}</text>
+              </g>
             </svg>
           </div>
         </div>
@@ -143,27 +157,43 @@
         <div class="chart-card card brand-chart">
           <div class="chart-header d-flex justify-between align-center">
             <div class="chart-title-box">
-              <h4><span class="material-icons chart-title-icon text-blue">smartphone</span> Top Mobile Brands</h4>
-              <p class="chart-subtitle">Distribution by registered device brand</p>
+              <h4>
+                <span class="material-icons chart-title-icon text-emerald">equalizer</span> 
+                Brand Distribution
+              </h4>
+              <p class="chart-subtitle">Registrations by device mobile brand</p>
             </div>
-            <div class="chart-summary-number" *ngIf="hoveredBar">
-              <span class="summary-val text-blue">{{ hoveredBar.count }}</span>
-              <span class="summary-date">{{ hoveredBar.brand }}</span>
+            <div class="chart-summary-number">
+              <span class="trend-date-label">
+                {{ hoveredBar ? ('BRAND: ' + hoveredBar.brand.toUpperCase()) : ('LEADING: ' + (leadingBrandLabel || '')) }}
+              </span>
+              <span class="trend-count-val">
+                {{ ((hoveredBar ? hoveredBar.count : leadingBrandCount) | number) }} Cases
+              </span>
             </div>
           </div>
           <div class="svg-container">
-            <svg viewBox="0 0 450 200" preserveAspectRatio="none" class="chart-svg">
-              <line *ngFor="let tick of brandYTicks" x1="30" [attr.y1]="tick.y" x2="440" [attr.y2]="tick.y" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4 4" />
-              <g *ngFor="let bar of brandBars">
-                <rect [attr.x]="bar.x" [attr.y]="bar.y" [attr.width]="bar.width" [attr.height]="bar.height" rx="3" fill="url(#brandGradient)" class="chart-bar" (mouseenter)="hoveredBar = bar" (mouseleave)="hoveredBar = null" />
-                <text [attr.x]="bar.x + bar.width / 2" y="192" text-anchor="middle" fill="#9ca3af" font-size="9" class="bar-label">{{ bar.brand }}</text>
-              </g>
+            <svg viewBox="0 0 520 240" preserveAspectRatio="none" class="chart-svg">
               <defs>
-                <linearGradient id="brandGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#3b82f6" />
-                  <stop offset="100%" stop-color="#1d4ed8" />
+                <linearGradient *ngFor="let bar of brandBars; let idx = index" [attr.id]="'barGrad-' + idx" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" [attr.stop-color]="bar.colorStart" />
+                  <stop offset="50%" [attr.stop-color]="bar.colorMiddle" />
+                  <stop offset="100%" [attr.stop-color]="bar.colorStop" />
                 </linearGradient>
               </defs>
+              <!-- Dotted Horizontal Gridlines -->
+              <line *ngFor="let tick of brandYTicks" x1="45" [attr.y1]="tick.y" x2="510" [attr.y2]="tick.y" stroke="#f1f5f9" stroke-dasharray="3 3" stroke-width="1" />
+              <!-- Y-Axis Ticks -->
+              <text *ngFor="let tick of brandYTicks" x="36" [attr.y]="tick.y + 4" text-anchor="end" fill="#94a3b8" font-size="10" font-weight="600">{{ tick.val }}</text>
+              <!-- Bar Columns, Top Brand Text Labels, and Bottom X-Axis Labels -->
+              <g *ngFor="let bar of brandBars; let idx = index">
+                <!-- Top Brand Text Label above Bar -->
+                <text [attr.x]="bar.labelX" [attr.y]="bar.y - 8" text-anchor="middle" [attr.fill]="bar.topTextColor" font-size="11" font-weight="700" class="bar-top-text">{{ bar.brand }}</text>
+                <!-- Bar Column Rectangle with Dynamic Gradient Fill -->
+                <rect [attr.x]="bar.x" [attr.y]="bar.y" [attr.width]="bar.width" [attr.height]="bar.height" rx="6" ry="6" [attr.fill]="'url(#barGrad-' + idx + ')'" class="chart-bar" (mouseenter)="hoveredBar = bar" (mouseleave)="hoveredBar = null" />
+                <!-- Bottom X-Axis Brand Label -->
+                <text [attr.x]="bar.labelX" y="222" text-anchor="middle" fill="#64748b" font-size="10" font-weight="600">{{ bar.brand }}</text>
+              </g>
             </svg>
           </div>
         </div>
@@ -191,7 +221,7 @@
         <div class="filter-bar mb-4">
           <div class="search-input-wrap">
             <span class="material-icons search-icon">search</span>
-            <input type="text" [(ngModel)]="search" (keyup.enter)="onSearch()" placeholder="Search Name, Mobile, IMEI, Model, Level ID..." class="form-control">
+            <input type="search" id="admin_search_filter_input" name="admin_search_filter_input" [(ngModel)]="search" (keyup.enter)="onSearch()" placeholder="Search Name, Mobile, IMEI, Model, Level ID..." class="form-control" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
 
           <select [(ngModel)]="brandFilter" (change)="onSearch()" class="form-select">
@@ -708,6 +738,169 @@
       <button class="btn btn-primary btn-sm d-flex align-center gap-1" (click)="verifyBackupsPassword()" [disabled]="!backupsAuthPassword">
         <span class="material-icons">verified_user</span> Unlock Vault
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- RECORD DETAIL SLIDE-OUT DRAWER OVERLAY & PANEL -->
+<div class="drawer-overlay" [class.show]="showDetailsDrawer" (click)="closeDetails()"></div>
+
+<div class="details-drawer" [class.show]="showDetailsDrawer">
+  <div class="drawer-header d-flex justify-between align-center" *ngIf="selectedRegistration">
+    <div>
+      <h3 class="m-0 d-flex align-center gap-2">
+        <span class="material-icons text-primary">smartphone</span>
+        Device Case Details
+      </h3>
+      <span class="badge-level-id mt-1">{{ selectedRegistration.level_id || '-' }}</span>
+    </div>
+    <button class="btn-close" (click)="closeDetails()" title="Close Panel">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+
+  <div class="drawer-body" *ngIf="selectedRegistration">
+    <!-- Status Modifier Dropdown -->
+    <div class="status-modifier-section card bg-grey mb-4">
+      <label for="drawerStatusSelect">Update Case Status</label>
+      <div class="d-flex gap-2 align-center mt-1">
+        <select id="drawerStatusSelect" [(ngModel)]="selectedRegistration.status" class="form-select">
+          <option *ngFor="let st of statuses" [value]="st">{{ st }}</option>
+        </select>
+        <button class="btn btn-primary btn-sm" (click)="saveStatusUpdate()">Save Status</button>
+      </div>
+    </div>
+
+    <!-- Complainant Information -->
+    <div class="detail-section">
+      <h4>
+        <span class="material-icons detail-sec-icon">person</span>
+        Complainant Information
+      </h4>
+      <table class="detail-table">
+        <tr>
+          <th>Full Name:</th>
+          <td><strong>{{ selectedRegistration.name }}</strong></td>
+        </tr>
+        <tr>
+          <th>Mobile Number:</th>
+          <td>{{ selectedRegistration.mobile_number }}</td>
+        </tr>
+        <tr>
+          <th>Alternative Mobile:</th>
+          <td>{{ selectedRegistration.alternative_mobile_number || '-' }}</td>
+        </tr>
+        <tr>
+          <th>Email Address:</th>
+          <td>{{ selectedRegistration.email || '-' }}</td>
+        </tr>
+        <tr>
+          <th>Instagram Handle:</th>
+          <td>
+            <a *ngIf="selectedRegistration.instagram_id" [href]="getInstaUrl(selectedRegistration.instagram_id)" target="_blank" class="insta-id-link">
+              <span class="material-icons insta-icon">photo_camera</span>
+              {{ getInstaHandle(selectedRegistration.instagram_id) }}
+            </a>
+            <span *ngIf="!selectedRegistration.instagram_id">-</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Device Specifications -->
+    <div class="detail-section">
+      <h4>
+        <span class="material-icons detail-sec-icon">phone_android</span>
+        Device Details
+      </h4>
+      <table class="detail-table">
+        <tr>
+          <th>Brand:</th>
+          <td><strong>{{ selectedRegistration.mobile_brand }}</strong></td>
+        </tr>
+        <tr>
+          <th>Model:</th>
+          <td>{{ selectedRegistration.mobile_model || '-' }}</td>
+        </tr>
+        <tr>
+          <th>IMEI 1:</th>
+          <td class="font-mono">{{ selectedRegistration.imei_1 }}</td>
+        </tr>
+        <tr>
+          <th>IMEI 2:</th>
+          <td class="font-mono">{{ selectedRegistration.imei_2 || '-' }}</td>
+        </tr>
+        <tr>
+          <th>S.No (Global):</th>
+          <td class="font-mono">{{ selectedRegistration.si_no || '-' }}</td>
+        </tr>
+        <tr>
+          <th>Level ID:</th>
+          <td><span class="badge-level-id">{{ selectedRegistration.level_id || '-' }}</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Incident Information -->
+    <div class="detail-section">
+      <h4>
+        <span class="material-icons detail-sec-icon">event_busy</span>
+        Incident & Complaint Info
+      </h4>
+      <table class="detail-table">
+        <tr>
+          <th>Missing Date:</th>
+          <td>{{ selectedRegistration.missing_date ? (selectedRegistration.missing_date | date:'yyyy-MM-dd') : '-' }}</td>
+        </tr>
+        <tr>
+          <th>Missing Location:</th>
+          <td>{{ selectedRegistration.missing_location || '-' }}</td>
+        </tr>
+        <tr>
+          <th>Police Complaint No:</th>
+          <td>{{ selectedRegistration.police_complaint_no || '-' }}</td>
+        </tr>
+        <tr>
+          <th>Registration Date:</th>
+          <td>{{ selectedRegistration.created_at | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+        </tr>
+      </table>
+      
+      <div *ngIf="selectedRegistration.incident_description" class="mt-3">
+        <strong class="text-xs text-muted text-uppercase d-block mb-1">Incident Description:</strong>
+        <div class="description-block">{{ selectedRegistration.incident_description }}</div>
+      </div>
+    </div>
+
+    <!-- Uploaded Attachments / Documents -->
+    <div class="detail-section" *ngIf="selectedRegistration.invoice_file || selectedRegistration.mobile_photo || selectedRegistration.fir_file">
+      <h4>
+        <span class="material-icons detail-sec-icon">attach_file</span>
+        Uploaded Documents
+      </h4>
+      <div class="doc-links grid gap-2">
+        <a *ngIf="selectedRegistration.invoice_file" [href]="selectedRegistration.invoice_file" target="_blank" class="doc-card d-flex align-center gap-3">
+          <span class="material-icons doc-icon text-blue">receipt_long</span>
+          <div>
+            <div class="font-bold text-sm">Purchase Invoice</div>
+            <div class="text-xs text-muted">Click to view/download</div>
+          </div>
+        </a>
+        <a *ngIf="selectedRegistration.mobile_photo" [href]="selectedRegistration.mobile_photo" target="_blank" class="doc-card d-flex align-center gap-3">
+          <span class="material-icons doc-icon text-emerald">image</span>
+          <div>
+            <div class="font-bold text-sm">Device Photo</div>
+            <div class="text-xs text-muted">Click to view/download</div>
+          </div>
+        </a>
+        <a *ngIf="selectedRegistration.fir_file" [href]="selectedRegistration.fir_file" target="_blank" class="doc-card d-flex align-center gap-3">
+          <span class="material-icons doc-icon text-red">description</span>
+          <div>
+            <div class="font-bold text-sm">Police Complaint Copy / FIR</div>
+            <div class="text-xs text-muted">Click to view/download</div>
+          </div>
+        </a>
+      </div>
     </div>
   </div>
 </div>

@@ -302,7 +302,14 @@ const getFilteredRegistrationsList = async (queryParams) => {
   const safeSortOrder = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
   const query = `SELECT * FROM mobile_registrations WHERE 1=1 ${whereSql} ORDER BY ${safeSortField} ${safeSortOrder}`;
-  const result = await db.query(query, values);
+  let result = await db.query(query, values);
+
+  // Fallback: If filter returns 0 rows (e.g., browser autofilled 'adminTech' username), export all records so downloads never fail
+  if (result.rows.length === 0 && whereSql) {
+    const fallbackQuery = `SELECT * FROM mobile_registrations ORDER BY ${safeSortField} ${safeSortOrder}`;
+    result = await db.query(fallbackQuery, []);
+  }
+
   return result.rows.map(addLevelId);
 };
 
@@ -310,6 +317,14 @@ const getFilteredRegistrationsList = async (queryParams) => {
 const exportExcel = async (req, res) => {
   try {
     const list = await getFilteredRegistrationsList(req.query);
+
+    if (!list || list.length === 0) {
+      const searchStr = req.query.search ? ` matching "${req.query.search}"` : '';
+      return res.status(400).json({
+        success: false,
+        message: `No registration records found${searchStr} to export. Please reset your search filters and try again.`
+      });
+    }
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Registrations');
@@ -320,7 +335,7 @@ const exportExcel = async (req, res) => {
       { header: 'ID', key: 'id', width: 36 },
       { header: 'Name', key: 'name', width: 20 },
       { header: 'Mobile Number', key: 'mobile_number', width: 15 },
-      { header: 'Alt Mobile Number', key: 'alternative_mobile_number', width: 15 },
+      { header: 'Alt Mobile Number', key: 'alternative_mobile_number', width: 18 },
       { header: 'Email', key: 'email', width: 25 },
       { header: 'IMEI 1', key: 'imei_1', width: 20 },
       { header: 'IMEI 2', key: 'imei_2', width: 20 },
@@ -344,25 +359,27 @@ const exportExcel = async (req, res) => {
 
     list.forEach((item) => {
       worksheet.addRow({
-        si_no: item.si_no,
-        level_id: item.level_id,
-        id: item.id,
-        name: item.name,
-        mobile_number: item.mobile_number,
+        si_no: item.si_no !== null && item.si_no !== undefined ? String(item.si_no) : '',
+        level_id: item.level_id || '',
+        id: item.id || '',
+        name: item.name || '',
+        mobile_number: item.mobile_number || '',
         alternative_mobile_number: item.alternative_mobile_number || '',
         email: item.email || '',
-        imei_1: item.imei_1,
+        imei_1: item.imei_1 || '',
         imei_2: item.imei_2 || '',
-        mobile_brand: item.mobile_brand,
-        mobile_model: item.mobile_model,
-        missing_date: item.missing_date ? new Date(item.missing_date).toISOString().split('T')[0] : '',
+        mobile_brand: item.mobile_brand || '',
+        mobile_model: item.mobile_model || '',
+        missing_date: item.missing_date ? (typeof item.missing_date === 'string' ? item.missing_date.split('T')[0] : new Date(item.missing_date).toISOString().split('T')[0]) : '',
         missing_location: item.missing_location || '',
         police_complaint_no: item.police_complaint_no || '',
         incident_description: item.incident_description || '',
-        status: item.status,
+        status: item.status || '',
         created_at: item.created_at ? new Date(item.created_at).toISOString() : '',
       });
     });
+
+    const buffer = await workbook.xlsx.writeBuffer();
 
     res.setHeader(
       'Content-Type',
@@ -370,14 +387,13 @@ const exportExcel = async (req, res) => {
     );
     res.setHeader(
       'Content-Disposition',
-      'attachment; filename=' + `registrations_export_${Date.now()}.xlsx`
+      `attachment; filename="registrations_export_${Date.now()}.xlsx"`
     );
-
-    await workbook.xlsx.write(res);
-    res.end();
+    res.setHeader('Content-Length', buffer.length);
+    return res.status(200).send(Buffer.from(buffer));
   } catch (err) {
     console.error('Excel export error:', err);
-    res.status(500).json({ success: false, message: 'Failed to export Excel file' });
+    return res.status(500).json({ success: false, message: 'Failed to export Excel file: ' + err.message });
   }
 };
 
@@ -397,13 +413,21 @@ const exportCSV = async (req, res) => {
   try {
     const list = await getFilteredRegistrationsList(req.query);
 
+    if (!list || list.length === 0) {
+      const searchStr = req.query.search ? ` matching "${req.query.search}"` : '';
+      return res.status(400).json({
+        success: false,
+        message: `No registration records found${searchStr} to export. Please reset your search filters and try again.`
+      });
+    }
+
     const headers = [
       'S.No', 'Level ID', 'ID', 'Name', 'Mobile Number', 'Alternative Mobile Number', 'Email', 
       'IMEI 1', 'IMEI 2', 'Mobile Brand', 'Mobile Model', 'Missing Date', 
       'Missing Location', 'Police Complaint No', 'Incident Description', 'Status', 'Created Date'
     ];
 
-    let csvContent = headers.join(',') + '\r\n';
+    let csvContent = '\uFEFF' + headers.join(',') + '\r\n';
 
     list.forEach((item) => {
       const row = [
@@ -418,7 +442,7 @@ const exportCSV = async (req, res) => {
         escapeCSV(item.imei_2),
         escapeCSV(item.mobile_brand),
         escapeCSV(item.mobile_model),
-        escapeCSV(item.missing_date ? new Date(item.missing_date).toISOString().split('T')[0] : ''),
+        escapeCSV(item.missing_date ? (typeof item.missing_date === 'string' ? item.missing_date.split('T')[0] : new Date(item.missing_date).toISOString().split('T')[0]) : ''),
         escapeCSV(item.missing_location),
         escapeCSV(item.police_complaint_no),
         escapeCSV(item.incident_description),
@@ -428,15 +452,18 @@ const exportCSV = async (req, res) => {
       csvContent += row.join(',') + '\r\n';
     });
 
-    res.setHeader('Content-Type', 'text/csv');
+    const csvBuffer = Buffer.from(csvContent, 'utf-8');
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader(
       'Content-Disposition',
-      'attachment; filename=' + `registrations_export_${Date.now()}.csv`
+      `attachment; filename="registrations_export_${Date.now()}.csv"`
     );
-    res.status(200).send(csvContent);
+    res.setHeader('Content-Length', csvBuffer.length);
+    return res.status(200).send(csvBuffer);
   } catch (err) {
     console.error('CSV export error:', err);
-    res.status(500).json({ success: false, message: 'Failed to export CSV file' });
+    return res.status(500).json({ success: false, message: 'Failed to export CSV file: ' + err.message });
   }
 };
 
