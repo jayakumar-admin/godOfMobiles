@@ -236,12 +236,33 @@
 
 .search-input-wrap .search-icon {
   position: absolute;
-  left: 0.75rem;
+  left: 0.85rem;
   top: 50%;
   transform: translateY(-50%);
   color: #64748b;
   font-size: 1.15rem;
   pointer-events: none;
+  z-index: 2;
+  transition: color 0.2s ease;
+}
+
+.search-input-wrap:focus-within .search-icon {
+  color: #3b82f6;
+}
+
+.search-input-wrap .form-control {
+  padding-left: 2.6rem !important;
+}
+
+.search-input-wrap .form-control::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.search-input-wrap .form-control:-webkit-autofill,
+.search-input-wrap .form-control:-webkit-autofill:hover,
+.search-input-wrap .form-control:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
 }
 
 .form-control,
