@@ -480,6 +480,190 @@ const updateSetting = async (req, res) => {
   }
 };
 
+// --- DATABASE BACKUP & DISASTER RECOVERY CONTROLLERS ---
+const backupService = require('../services/backupService');
+
+// Get All Backups & Stats
+const getBackups = async (req, res) => {
+  try {
+    const { search = '', type = '' } = req.query;
+    const data = await backupService.getBackups({ search, type });
+    res.json({
+      success: true,
+      data: data.backups,
+      stats: data.stats
+    });
+  } catch (err) {
+    console.error('Error fetching backups:', err);
+    res.status(500).json({ success: false, message: 'Failed to fetch database backups' });
+  }
+};
+
+// Create Manual Backup Snapshot
+const createBackup = async (req, res) => {
+  try {
+    const createdBy = req.user ? req.user.username : 'Administrator';
+    const backup = await backupService.createBackup({
+      type: 'MANUAL',
+      createdBy
+    });
+    res.status(201).json({
+      success: true,
+      message: 'Database backup snapshot created successfully',
+      data: backup
+    });
+  } catch (err) {
+    console.error('Error creating backup:', err);
+    res.status(500).json({ success: false, message: 'Failed to create database backup snapshot' });
+  }
+};
+
+// Upload External Backup ZIP and Restore Database Data
+const uploadBackup = async (req, res) => {
+  try {
+    let fileBuffer = null;
+    let fileName = 'uploaded_backup.zip';
+
+    if (req.file) {
+      fileBuffer = req.file.buffer || require('fs').readFileSync(req.file.path);
+      fileName = req.file.originalname || req.file.filename;
+    } else if (req.files && req.files.backup_zip) {
+      const f = req.files.backup_zip[0];
+      fileBuffer = f.buffer || require('fs').readFileSync(f.path);
+      fileName = f.originalname || f.filename;
+    }
+
+    if (!fileBuffer) {
+      return res.status(400).json({ success: false, message: 'No backup zip file uploaded' });
+    }
+
+    const createdBy = req.user ? req.user.username : 'Administrator';
+
+    // 1. Upload and register snapshot in storage and database catalog
+    const backup = await backupService.createBackup({
+      type: 'UPLOAD',
+      createdBy,
+      fileBuffer,
+      customName: fileName
+    });
+
+    // 2. Automatically restore database tables & rows from uploaded backup
+    const restoreResult = await backupService.restoreBackup(backup.id, createdBy);
+
+    res.status(201).json({
+      success: true,
+      message: `Backup ZIP uploaded and database restored successfully! Restored ${restoreResult.restoredTablesCount} tables (${restoreResult.totalRestoredRows} total rows). Safety snapshot created: ${restoreResult.safetyBackupName || 'Yes'}`,
+      data: {
+        ...backup,
+        restoreResult
+      }
+    });
+  } catch (err) {
+    console.error('Error uploading and restoring backup zip:', err);
+    res.status(500).json({ success: false, message: `Failed to restore database from uploaded backup zip: ${err.message}` });
+  }
+};
+
+// Restore Database from Snapshot
+const restoreBackup = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+
+    if (!password || password.trim() === '') {
+      return res.status(400).json({ success: false, message: 'Security password is required for database restore / மீட்டமைப்பிற்கு பாதுகாப்பு கடவுச்சொல் தேவை' });
+    }
+
+    // Verify static security password Mec170761$ or admin account password
+    let isMatch = (password.trim() === 'Mec170761$');
+    if (!isMatch) {
+      const adminRes = await db.query('SELECT * FROM admins WHERE username = $1', ['admin']);
+      if (adminRes.rows.length > 0) {
+        isMatch = await bcrypt.compare(password.trim(), adminRes.rows[0].password);
+      }
+    }
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Incorrect security password / தவறான பாதுகாப்பு கடவுச்சொல்' });
+    }
+
+    const restoredBy = req.user ? req.user.username : 'Administrator';
+
+    const result = await backupService.restoreBackup(id, restoredBy);
+    res.json({
+      success: true,
+      message: `Database restored successfully. Restored ${result.restoredTablesCount} tables (${result.totalRestoredRows} total rows). Safety backup created: ${result.safetyBackupName || 'Yes'}`,
+      data: result
+    });
+  } catch (err) {
+    console.error('Error restoring backup:', err);
+    res.status(500).json({ success: false, message: err.message || 'Failed to restore database from backup' });
+  }
+};
+
+// Download Backup ZIP File
+const downloadBackup = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const storageService = require('../services/storageService');
+
+    const recRes = await db.query('SELECT * FROM database_backups WHERE id = $1', [id]);
+    if (recRes.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Backup record not found' });
+    }
+
+    const record = recRes.rows[0];
+    const buffer = await storageService.downloadFile(record.storage_path);
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${record.name}"`);
+    res.send(buffer);
+  } catch (err) {
+    console.error('Error downloading backup:', err);
+    res.status(500).json({ success: false, message: 'Failed to download backup zip' });
+  }
+};
+
+// Delete Backup Record & File
+const deleteBackup = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await backupService.deleteBackup(id);
+    res.json({
+      success: true,
+      message: 'Backup snapshot deleted successfully from storage and vault history',
+      data: result
+    });
+  } catch (err) {
+    console.error('Error deleting backup:', err);
+    res.status(500).json({ success: false, message: 'Failed to delete database backup' });
+  }
+};
+
+// System Health Check
+const checkSystemHealth = async (req, res) => {
+  try {
+    const storageService = require('../services/storageService');
+
+    const dbRes = await db.query('SELECT NOW()');
+    const health = await storageService.checkHealth();
+
+    res.json({
+      success: true,
+      healthy: health.healthy,
+      dbConnected: !!dbRes.rows[0].now,
+      serverTime: dbRes.rows[0].now,
+      storageRoot: health.storageRoot,
+      message: 'BACKUP SYSTEM HEALTHY'
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      healthy: false,
+      message: 'BACKUP SYSTEM DEGRADED: ' + err.message
+    });
+  }
+};
+
 module.exports = {
   login,
   getRegistrations,
@@ -489,5 +673,13 @@ module.exports = {
   exportExcel,
   exportCSV,
   getSettings,
-  updateSetting
+  updateSetting,
+  getBackups,
+  createBackup,
+  uploadBackup,
+  restoreBackup,
+  downloadBackup,
+  deleteBackup,
+  checkSystemHealth
 };
+

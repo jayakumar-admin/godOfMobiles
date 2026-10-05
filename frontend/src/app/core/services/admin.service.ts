@@ -1,12 +1,13 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
-  private baseUrl = 'https://api-ymcsyccz5a-uc.a.run.app/api/admin';
+  private baseUrl = `${environment.apiUrl}/admin`;
   token = signal<string | null>(localStorage.getItem('admin_token'));
 
   constructor(private http: HttpClient) { }
@@ -86,4 +87,39 @@ export class AdminService {
       responseType: 'blob'
     });
   }
+
+  // --- DATABASE BACKUP & DISASTER RECOVERY METHODS ---
+  getBackups(filters: any = {}): Observable<any> {
+    let params = new HttpParams();
+    if (filters.search) params = params.set('search', filters.search);
+    if (filters.type && filters.type !== 'ALL') params = params.set('type', filters.type);
+    return this.http.get(`${this.baseUrl}/backups`, { params });
+  }
+
+  createBackupNow(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/backups/now`, {});
+  }
+
+  uploadBackupZip(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('backup_zip', file, file.name);
+    return this.http.post(`${this.baseUrl}/backups/upload`, formData);
+  }
+
+  restoreBackup(id: string, password?: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/backups/${id}/restore`, { password });
+  }
+
+  downloadBackup(id: string): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/backups/${id}/download`, { responseType: 'blob' });
+  }
+
+  deleteBackup(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/backups/${id}`);
+  }
+
+  getBackupHealth(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/backups/health`);
+  }
 }
+

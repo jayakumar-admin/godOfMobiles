@@ -41,7 +41,7 @@ const swaggerDocument = {
                   fir_file: { type: 'string', format: 'binary', description: 'Upload FIR copy (PDF/JPG/PNG)' },
                   consent: { type: 'boolean', example: true }
                 },
-                required: ['name', 'mobile_number', 'imei_1', 'mobile_brand', 'mobile_model', 'missing_date', 'missing_location', 'invoice_file', 'consent']
+                required: ['name', 'mobile_number', 'imei_1', 'mobile_brand', 'missing_date', 'invoice_file', 'consent']
               }
             }
           }
@@ -124,7 +124,7 @@ const swaggerDocument = {
         parameters: [
           { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
           { name: 'limit', in: 'query', schema: { type: 'integer', default: 10 } },
-          { name: 'search', in: 'query', schema: { type: 'string' }, description: 'Search Name, Mobile, IMEI, or Model' },
+          { name: 'search', in: 'query', schema: { type: 'string' }, description: 'Search Name, Mobile, or IMEI' },
           { name: 'brand', in: 'query', schema: { type: 'string' } },
           { name: 'status', in: 'query', schema: { type: 'string' } },
           { name: 'startDate', in: 'query', schema: { type: 'string', format: 'date' } },

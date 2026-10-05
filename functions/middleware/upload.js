@@ -4,24 +4,26 @@ const fs = require('fs');
 const Busboy = require('busboy');
 
 const uploadDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// if (!fs.existsSync(uploadDir)) {
+//   fs.mkdirSync(uploadDir, { recursive: true });
+// }
 
 // Allowed extensions per field
 const ALLOWED_EXTENSIONS = {
   invoice_file: ['.pdf', '.jpg', '.jpeg', '.png'],
   mobile_photo: ['.jpg', '.jpeg', '.png'],
   fir_file: ['.pdf', '.jpg', '.jpeg', '.png'],
+  backup_zip: ['.zip'],
 };
 
 const ERROR_MESSAGES = {
   invoice_file: 'Mobile Invoice must be a PDF, JPG, or PNG / மொபைல் இன்வாய்ஸ் PDF, JPG அல்லது PNG ஆக இருக்க வேண்டும்',
   mobile_photo: 'Mobile Photo must be a JPG or PNG / மொபைல் புகைப்படம் JPG அல்லது PNG ஆக இருக்க வேண்டும்',
   fir_file: 'FIR copy must be a PDF, JPG, or PNG / காவல் நிலைய புகார்படி PDF, JPG அல்லது PNG ஆக இருக்க வேண்டும்',
+  backup_zip: 'Backup file must be a ZIP archive',
 };
 
-const FIELD_NAMES = ['invoice_file', 'mobile_photo', 'fir_file'];
+const FIELD_NAMES = ['invoice_file', 'mobile_photo', 'fir_file', 'backup_zip'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 /**
@@ -94,7 +96,7 @@ function firebaseBusboyUpload(req, res, next) {
       writeStream.on('finish', () => {
         if (fileTooLarge) {
           // Clean up oversized file
-          fs.unlink(saveTo, () => {});
+          fs.unlink(saveTo, () => { });
           return reject(new Error(`File ${fieldname} exceeds 5MB limit`));
         }
 

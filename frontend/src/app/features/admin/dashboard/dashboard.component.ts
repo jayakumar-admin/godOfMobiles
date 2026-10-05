@@ -62,6 +62,10 @@ export class DashboardComponent implements OnInit {
   newInstagramUsername = '';
   isSavingSettings = false;
 
+  // Restore Modal Security Password
+  restoreConfirmPassword = '';
+  restoreErrorMsg = '';
+
   // Brand dropdown options
   brands = [
     'Samsung', 'Apple', 'Vivo', 'Oppo', 'Redmi',
@@ -278,7 +282,72 @@ export class DashboardComponent implements OnInit {
     this.visiblePages = pages;
   }
 
+  Math = Math;
+
   // Filters Handlers
+  onSearch() {
+    this.page = 1;
+    this.loadRegistrations();
+  }
+
+  resetFilters() {
+    this.search = '';
+    this.brandFilter = '';
+    this.statusFilter = '';
+    this.startDate = '';
+    this.endDate = '';
+    this.page = 1;
+    this.loadRegistrations();
+  }
+
+  toggleSort(field: string) {
+    this.onSort(field);
+  }
+
+  getStatusClass(status: string): string {
+    if (!status) return '';
+    switch (status.toLowerCase()) {
+      case 'new': return 'new';
+      case 'under review': return 'review';
+      case 'contacted': return 'contacted';
+      case 'recovery in progress': return 'recovery-in-progress';
+      case 'recovered': return 'recovered';
+      case 'closed': return 'closed';
+      default: return '';
+    }
+  }
+
+  getInstaUrl(insta: string): string {
+    if (!insta) return '#';
+    if (insta.startsWith('http')) return insta;
+    const handle = insta.replace('@', '').trim();
+    return `https://www.instagram.com/${handle}`;
+  }
+
+  getInstaHandle(insta: string): string {
+    if (!insta) return '-';
+    if (insta.startsWith('http')) {
+      const parts = insta.split('/').filter(p => p.length > 0);
+      return parts[parts.length - 1] || insta;
+    }
+    return insta.startsWith('@') ? insta : `@${insta}`;
+  }
+
+  getSortIcon(field: string): string {
+    if (this.sortField !== field) return 'unfold_more';
+    return this.sortOrder === 'ASC' ? 'arrow_upward' : 'arrow_downward';
+  }
+
+  isSorted(field: string): boolean {
+    return this.sortField === field;
+  }
+
+  saveStatusUpdate() {
+    if (this.selectedRegistration && this.selectedRegistration.status) {
+      this.onUpdateStatus(this.selectedRegistration.status);
+    }
+  }
+
   onApplyFilters() {
     this.page = 1;
     this.loadRegistrations();
@@ -447,8 +516,425 @@ export class DashboardComponent implements OnInit {
     window.URL.revokeObjectURL(url);
   }
 
+  // Active Admin View Tab
+  activeTab: 'dashboard' | 'backups' = 'dashboard';
+
+  // Database Backups & Vault State
+  backups: any[] = [];
+  backupStats: any = {
+    lastBackup: null,
+    nextSchedule: { title: 'Weekly Once', detail: 'Sundays 02:00 AM IST' },
+    totalBackups: 0,
+    retentionPolicy: 'Keep latest 8',
+    storageUsedBytes: 0,
+    storageUsedFormatted: '0 B',
+    dbTables: 0,
+    tablesSubtitle: '100% current & future tables',
+    lastSize: '0 B',
+    lastDuration: '-',
+    systemHealth: 'HEALTHY',
+    storageRoot: 'db_backups/'
+  };
+
+  backupSearch = '';
+  backupTypeFilter = 'ALL';
+  isBackingUp = false;
+  isRestoring = false;
+  isUploadingBackup = false;
+  isLoadingBackups = false;
+
+  selectedBackupForRestore: any = null;
+  showRestoreConfirmModal = false;
+
+  showUploadZipModal = false;
+  selectedZipFile: File | null = null;
+  uploadProgress = false;
+  isCheckingHealth = false;
+
+  // Progressing UI State for Database Operations
+  isOperationInProgress = false;
+  operationType: 'BACKUP' | 'UPLOAD' | 'RESTORE' | 'HEALTH' | null = null;
+  operationTitle = '';
+  operationDetail = '';
+  operationProgress = 0;
+  operationStage = 1;
+  operationSteps: string[] = [];
+  progressTimer: any = null;
+
+  startProgressTracker(type: 'BACKUP' | 'UPLOAD' | 'RESTORE' | 'HEALTH', title: string, steps: string[], detail: string) {
+    this.stopProgressTracker();
+    this.isOperationInProgress = true;
+    this.operationType = type;
+    this.operationTitle = title;
+    this.operationDetail = detail;
+    this.operationSteps = steps;
+    this.operationProgress = 12;
+    this.operationStage = 1;
+
+    this.progressTimer = setInterval(() => {
+      if (this.operationProgress < 92) {
+        this.operationProgress += Math.floor(Math.random() * 6) + 4;
+        if (this.operationProgress > 25 && this.operationStage < 2) {
+          this.operationStage = 2;
+        } else if (this.operationProgress > 55 && this.operationStage < 3) {
+          this.operationStage = 3;
+        } else if (this.operationProgress > 80 && this.operationStage < 4) {
+          this.operationStage = 4;
+        }
+      }
+    }, 350);
+  }
+
+  completeProgressTracker(success: boolean, callback?: () => void) {
+    if (this.progressTimer) {
+      clearInterval(this.progressTimer);
+      this.progressTimer = null;
+    }
+    this.operationProgress = 100;
+    this.operationStage = this.operationSteps.length;
+    setTimeout(() => {
+      this.isOperationInProgress = false;
+      this.operationType = null;
+      this.operationProgress = 0;
+      this.operationStage = 1;
+      if (callback) callback();
+    }, 700);
+  }
+
+  stopProgressTracker() {
+    if (this.progressTimer) {
+      clearInterval(this.progressTimer);
+      this.progressTimer = null;
+    }
+    this.isOperationInProgress = false;
+    this.operationType = null;
+    this.operationProgress = 0;
+  }
+
+  toastMessage = '';
+  toastType: 'success' | 'error' | 'info' = 'info';
+
+  // Database Vault Access Authorization Security State
+  isBackupsUnlocked = false;
+  showBackupsAuthModal = false;
+  backupsAuthPassword = '';
+  backupsAuthErrorMsg = '';
+
+  switchTab(tab: 'dashboard' | 'backups') {
+    if (tab === 'backups') {
+      if (this.isBackupsUnlocked) {
+        this.activeTab = 'backups';
+        this.loadBackups();
+      } else {
+        this.openBackupsAuthModal();
+      }
+    } else {
+      this.activeTab = tab;
+    }
+  }
+
+  openBackupsAuthModal() {
+    this.backupsAuthPassword = '';
+    this.backupsAuthErrorMsg = '';
+    this.showBackupsAuthModal = true;
+  }
+
+  closeBackupsAuthModal() {
+    this.showBackupsAuthModal = false;
+    this.backupsAuthPassword = '';
+    this.backupsAuthErrorMsg = '';
+  }
+
+  verifyBackupsPassword() {
+    if (!this.backupsAuthPassword || this.backupsAuthPassword.trim() === '') {
+      this.backupsAuthErrorMsg = 'Please enter security password / பாதுகாப்பு கடவுச்சொல்லை உள்ளிடவும்';
+      return;
+    }
+
+    if (this.backupsAuthPassword.trim() === 'Mec170761$') {
+      this.isBackupsUnlocked = true;
+      this.showBackupsAuthModal = false;
+      this.backupsAuthPassword = '';
+      this.backupsAuthErrorMsg = '';
+      this.activeTab = 'backups';
+      this.loadBackups();
+      this.showNotification('Database Vault Access Granted', 'success');
+    } else {
+      this.backupsAuthErrorMsg = 'Incorrect security password / தவறான பாதுகாப்பு கடவுச்சொல்';
+    }
+  }
+
+  lockBackupsAccess() {
+    this.isBackupsUnlocked = false;
+    this.activeTab = 'dashboard';
+    this.showNotification('Database Vault Locked', 'info');
+  }
+
+  loadBackups() {
+    this.isLoadingBackups = true;
+    this.adminService.getBackups({
+      search: this.backupSearch,
+      type: this.backupTypeFilter
+    }).subscribe({
+      next: (res) => {
+        this.isLoadingBackups = false;
+        if (res && res.success) {
+          this.backups = res.data || [];
+          if (res.stats) {
+            this.backupStats = res.stats;
+          }
+        }
+      },
+      error: (err) => {
+        this.isLoadingBackups = false;
+        console.error('Error loading backups:', err);
+        this.showNotification('Failed to fetch backup vault records', 'error');
+      }
+    });
+  }
+
+  onBackupSearch() {
+    this.loadBackups();
+  }
+
+  setBackupTypeFilter(type: string) {
+    this.backupTypeFilter = type;
+    this.loadBackups();
+  }
+
+  triggerBackupNow() {
+    if (this.isBackingUp || this.isOperationInProgress) return;
+    this.isBackingUp = true;
+
+    this.startProgressTracker(
+      'BACKUP',
+      'Creating Database Snapshot Package',
+      ['Extract Schemas & Data', 'Generate SHA-256 Checksum', 'Upload to Firebase Storage', 'Catalog Vault History'],
+      'Taking full PostgreSQL snapshot & uploading to Firebase Storage...'
+    );
+
+    this.adminService.createBackupNow().subscribe({
+      next: (res) => {
+        this.isBackingUp = false;
+        if (res && res.success) {
+          this.completeProgressTracker(true, () => {
+            this.showNotification('Database snapshot created successfully!', 'success');
+            this.loadBackups();
+          });
+        } else {
+          this.stopProgressTracker();
+          this.showNotification(res.message || 'Backup failed', 'error');
+        }
+      },
+      error: (err) => {
+        this.isBackingUp = false;
+        this.stopProgressTracker();
+        console.error('Error creating backup:', err);
+        this.showNotification(err.error?.message || 'Failed to create backup snapshot', 'error');
+      }
+    });
+  }
+
+  openUploadZipModal() {
+    this.selectedZipFile = null;
+    this.showUploadZipModal = true;
+  }
+
+  closeUploadZipModal() {
+    this.showUploadZipModal = false;
+    this.selectedZipFile = null;
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      if (!file.name.toLowerCase().endsWith('.zip')) {
+        this.showNotification('Please select a valid .ZIP backup file', 'error');
+        this.selectedZipFile = null;
+        return;
+      }
+      this.selectedZipFile = file;
+    }
+  }
+
+  submitUploadBackupZip() {
+    if (!this.selectedZipFile || this.isUploadingBackup || this.isOperationInProgress) return;
+    this.isUploadingBackup = true;
+
+    this.startProgressTracker(
+      'UPLOAD',
+      'Uploading & Restoring Backup ZIP Package',
+      ['Verify Package Metadata', 'Upload to Firebase Storage', 'Generate Safety Snapshot', 'Atomic Table Restore'],
+      'Uploading backup ZIP to Firebase Storage root: db_backups/...'
+    );
+
+    this.adminService.uploadBackupZip(this.selectedZipFile).subscribe({
+      next: (res) => {
+        this.isUploadingBackup = false;
+        this.closeUploadZipModal();
+        if (res && res.success) {
+          this.completeProgressTracker(true, () => {
+            this.showNotification('Backup ZIP uploaded & database restored successfully!', 'success');
+            this.loadBackups();
+            this.loadStats();
+            this.loadRegistrations();
+          });
+        } else {
+          this.stopProgressTracker();
+          this.showNotification(res.message || 'Upload failed', 'error');
+        }
+      },
+      error: (err) => {
+        this.isUploadingBackup = false;
+        this.stopProgressTracker();
+        console.error('Error uploading backup zip:', err);
+        this.showNotification(err.error?.message || 'Upload failed', 'error');
+      }
+    });
+  }
+
+  openRestoreModal(backup: any) {
+    this.selectedBackupForRestore = backup;
+    this.restoreConfirmPassword = '';
+    this.restoreErrorMsg = '';
+    this.showRestoreConfirmModal = true;
+  }
+
+  closeRestoreModal() {
+    this.showRestoreConfirmModal = false;
+    this.selectedBackupForRestore = null;
+    this.restoreConfirmPassword = '';
+    this.restoreErrorMsg = '';
+  }
+
+  confirmRestoreBackup() {
+    if (!this.selectedBackupForRestore || this.isRestoring || this.isOperationInProgress) return;
+    if (!this.restoreConfirmPassword || this.restoreConfirmPassword.trim() === '') {
+      this.restoreErrorMsg = 'Please enter security password / பாதுகாப்பு கடவுச்சொல்லை உள்ளிடவும்';
+      return;
+    }
+
+    this.restoreErrorMsg = '';
+    this.isRestoring = true;
+
+    this.startProgressTracker(
+      'RESTORE',
+      'Executing Disaster Recovery Database Restore',
+      ['Security Password Check', 'Pre-Restore Safety Snapshot', 'Atomic Table Truncate & Insert', 'Sequence Counter Alignment'],
+      'Verifying password & restoring database snapshot...'
+    );
+
+    const backupId = this.selectedBackupForRestore.id;
+    this.adminService.restoreBackup(backupId, this.restoreConfirmPassword.trim()).subscribe({
+      next: (res) => {
+        this.isRestoring = false;
+        this.closeRestoreModal();
+        if (res && res.success) {
+          this.completeProgressTracker(true, () => {
+            this.showNotification(res.message || 'Database restored successfully!', 'success');
+            this.loadBackups();
+            this.loadStats();
+            this.loadRegistrations();
+          });
+        } else {
+          this.stopProgressTracker();
+          this.showNotification(res.message || 'Restore failed', 'error');
+        }
+      },
+      error: (err) => {
+        this.isRestoring = false;
+        this.stopProgressTracker();
+        console.error('Error restoring backup:', err);
+        const errMsg = err.error?.message || 'Incorrect security password or restore failed';
+        this.restoreErrorMsg = errMsg;
+        this.showNotification(errMsg, 'error');
+      }
+    });
+  }
+
+  downloadBackupFile(backup: any) {
+    this.showNotification(`Downloading ${backup.name}...`, 'info');
+    this.adminService.downloadBackup(backup.id).subscribe({
+      next: (blob) => {
+        this.downloadBlob(blob, backup.name);
+      },
+      error: (err) => {
+        console.error('Error downloading backup file:', err);
+        this.showNotification('Failed to download backup file', 'error');
+      }
+    });
+  }
+
+  confirmDeleteBackup(backup: any) {
+    if (confirm(`Are you sure you want to permanently delete snapshot "${backup.name}" from storage?`)) {
+      this.adminService.deleteBackup(backup.id).subscribe({
+        next: (res) => {
+          if (res && res.success) {
+            this.showNotification('Backup snapshot deleted', 'success');
+            this.loadBackups();
+          }
+        },
+        error: (err) => {
+          console.error('Error deleting backup:', err);
+          this.showNotification('Failed to delete backup snapshot', 'error');
+        }
+      });
+    }
+  }
+
+  runSystemHealthCheck() {
+    if (this.isCheckingHealth || this.isOperationInProgress) return;
+    this.isCheckingHealth = true;
+
+    this.startProgressTracker(
+      'HEALTH',
+      'Verifying System & Storage Health',
+      ['Ping PostgreSQL Pool', 'Ping Firebase Cloud Storage', 'Validate Bucket Metadata'],
+      'Running system health check for PostgreSQL & Firebase Storage...'
+    );
+
+    this.adminService.getBackupHealth().subscribe({
+      next: (res) => {
+        this.isCheckingHealth = false;
+        if (res && res.healthy) {
+          this.completeProgressTracker(true, () => {
+            this.showNotification('🟢 BACKUP SYSTEM HEALTHY: PostgreSQL and Storage connected.', 'success');
+            this.loadBackups();
+          });
+        } else {
+          this.stopProgressTracker();
+          this.showNotification('🔴 BACKUP SYSTEM DEGRADED: ' + (res.message || 'Storage issue detected'), 'error');
+          this.loadBackups();
+        }
+      },
+      error: (err) => {
+        this.isCheckingHealth = false;
+        this.stopProgressTracker();
+        this.showNotification('🔴 BACKUP SYSTEM DEGRADED', 'error');
+      }
+    });
+  }
+
+  copyChecksum(checksum: string) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(checksum);
+      this.showNotification('SHA-256 Checksum copied to clipboard', 'info');
+    }
+  }
+
+  showNotification(msg: string, type: 'success' | 'error' | 'info' = 'info') {
+    this.toastMessage = msg;
+    this.toastType = type;
+    setTimeout(() => {
+      if (this.toastMessage === msg) {
+        this.toastMessage = '';
+      }
+    }, 4000);
+  }
+
   logout() {
     this.adminService.logout();
     this.router.navigate(['/admin/login']);
   }
 }
+

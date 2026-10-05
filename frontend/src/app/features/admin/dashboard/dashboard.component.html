@@ -1,10 +1,21 @@
 <!-- Admin Dashboard Header -->
 <header class="admin-header">
   <div class="container admin-nav d-flex justify-between align-center">
-    <div class="admin-logo d-flex align-center gap-2">
+    <div class="admin-logo d-flex align-center gap-3">
       <span class="badge-admin">Admin</span>
       <img src="/images/logo.png" alt="GOD OF Mobiles Logo" class="admin-logo-img">
+      
+      <!-- Nav Tabs Switcher -->
+      <nav class="admin-nav-tabs d-flex align-center gap-2">
+        <button class="nav-tab-link" [class.active]="activeTab === 'dashboard'" (click)="switchTab('dashboard')">
+          <span class="material-icons">grid_view</span> Registrations
+        </button>
+        <button class="nav-tab-link" [class.active]="activeTab === 'backups'" (click)="switchTab('backups')">
+          <span class="material-icons">backup</span> Database Backups
+        </button>
+      </nav>
     </div>
+    
     <div class="admin-actions d-flex align-center gap-2">
       <button class="btn-icon" (click)="openSettings()" title="Settings">
         <span class="material-icons">settings</span>
@@ -19,554 +30,617 @@
 <main class="admin-main">
   <div class="container-fluid dashboard-container">
 
-    <!-- KPI Panel Section -->
-    <section class="kpi-section grid gap-3 animate-fade-in">
+    <!-- Toast Notification Banner -->
+    <div class="toast-banner animate-fade-in" *ngIf="toastMessage" [ngClass]="toastType">
+      <span class="material-icons">info</span>
+      <span>{{ toastMessage }}</span>
+      <button class="btn-toast-close" (click)="toastMessage = ''">&times;</button>
+    </div>
 
-      <!-- Total -->
-      <div class="kpi-card total">
-        <div class="kpi-icon-box"><span class="material-icons">grid_view</span></div>
-        <div class="kpi-info">
-          <h3>{{ stats().totalRegistrations | number }}</h3>
-          <p>Total Registrations</p>
-        </div>
-      </div>
+    <!-- VIEW 1: REGISTRATIONS & DASHBOARD KPIs -->
+    <div *ngIf="activeTab === 'dashboard'">
 
-      <!-- Today -->
-      <div class="kpi-card today">
-        <div class="kpi-icon-box"><span class="material-icons">event</span></div>
-        <div class="kpi-info">
-          <h3>{{ stats().todayRegistrations | number }}</h3>
-          <p>Today's Registrations</p>
-        </div>
-      </div>
-
-      <!-- Pending -->
-      <div class="kpi-card pending">
-        <div class="kpi-icon-box"><span class="material-icons">pending_actions</span></div>
-        <div class="kpi-info">
-          <h3>{{ stats().pendingCases | number }}</h3>
-          <p>Pending Cases</p>
-        </div>
-      </div>
-
-      <!-- Under Review -->
-      <div class="kpi-card review">
-        <div class="kpi-icon-box"><span class="material-icons">rate_review</span></div>
-        <div class="kpi-info">
-          <h3>{{ stats().underReviewCases | number }}</h3>
-          <p>Under Review</p>
-        </div>
-      </div>
-
-      <!-- In Progress -->
-      <div class="kpi-card progress">
-        <div class="kpi-icon-box"><span class="material-icons">run_circle</span></div>
-        <div class="kpi-info">
-          <h3>{{ stats().recoveryInProgress | number }}</h3>
-          <p>Recovery In Progress</p>
-        </div>
-      </div>
-
-      <!-- Recovered -->
-      <div class="kpi-card recovered">
-        <div class="kpi-icon-box"><span class="material-icons">task_alt</span></div>
-        <div class="kpi-info">
-          <h3>{{ stats().recoveredCases | number }}</h3>
-          <p>Recovered Devices</p>
-        </div>
-      </div>
-
-      <!-- Closed -->
-      <div class="kpi-card closed">
-        <div class="kpi-icon-box"><span class="material-icons">cancel_presentation</span></div>
-        <div class="kpi-info">
-          <h3>{{ stats().closedCases | number }}</h3>
-          <p>Closed Cases</p>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Charts Data Visualisation Section -->
-    <section class="charts-section grid gap-3 animate-fade-in" *ngIf="trendPoints.length > 0 || brandBars.length > 0">
-
-      <!-- Daily Trend Line/Area Chart -->
-      <div class="chart-card card trend-chart">
-        <div class="chart-header d-flex justify-between align-center">
-          <div class="chart-title-box">
-            <h4><span class="material-icons chart-title-icon">trending_up</span> Registration Trend</h4>
-            <p class="chart-subtitle">Daily registered devices (last 14 days)</p>
-          </div>
-          <div class="chart-summary-number" *ngIf="hoveredPoint">
-            <span class="trend-date-label">{{ hoveredPoint.label }}</span>
-            <strong class="trend-count-val">{{ hoveredPoint.count }} Cases</strong>
-          </div>
-          <div class="chart-summary-number" *ngIf="!hoveredPoint && trendPoints.length > 0">
-            <span class="trend-date-label">Latest: {{ trendPoints[trendPoints.length - 1].label }}</span>
-            <strong class="trend-count-val">{{ trendPoints[trendPoints.length - 1].count }} Cases</strong>
+      <!-- KPI Panel Section -->
+      <section class="kpi-section grid gap-3 animate-fade-in">
+        <!-- Total -->
+        <div class="kpi-card total">
+          <div class="kpi-icon-box"><span class="material-icons">grid_view</span></div>
+          <div class="kpi-info">
+            <h3>{{ stats().totalRegistrations | number }}</h3>
+            <p>Total Registrations</p>
           </div>
         </div>
 
-        <div class="chart-body">
+        <!-- Today -->
+        <div class="kpi-card today">
+          <div class="kpi-icon-box"><span class="material-icons">event</span></div>
+          <div class="kpi-info">
+            <h3>{{ stats().todayRegistrations | number }}</h3>
+            <p>Today's Registrations</p>
+          </div>
+        </div>
+
+        <!-- Pending -->
+        <div class="kpi-card pending">
+          <div class="kpi-icon-box"><span class="material-icons">pending_actions</span></div>
+          <div class="kpi-info">
+            <h3>{{ stats().pendingCases | number }}</h3>
+            <p>Pending Cases</p>
+          </div>
+        </div>
+
+        <!-- Under Review -->
+        <div class="kpi-card review">
+          <div class="kpi-icon-box"><span class="material-icons">rate_review</span></div>
+          <div class="kpi-info">
+            <h3>{{ stats().underReviewCases | number }}</h3>
+            <p>Under Review</p>
+          </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="kpi-card progress">
+          <div class="kpi-icon-box"><span class="material-icons">run_circle</span></div>
+          <div class="kpi-info">
+            <h3>{{ stats().recoveryInProgress | number }}</h3>
+            <p>Recovery In Progress</p>
+          </div>
+        </div>
+
+        <!-- Recovered -->
+        <div class="kpi-card recovered">
+          <div class="kpi-icon-box"><span class="material-icons">task_alt</span></div>
+          <div class="kpi-info">
+            <h3>{{ stats().recoveredCases | number }}</h3>
+            <p>Recovered Devices</p>
+          </div>
+        </div>
+
+        <!-- Closed -->
+        <div class="kpi-card closed">
+          <div class="kpi-icon-box"><span class="material-icons">cancel_presentation</span></div>
+          <div class="kpi-info">
+            <h3>{{ stats().closedCases | number }}</h3>
+            <p>Closed Cases</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Charts Data Visualisation Section -->
+      <section class="charts-section grid gap-3 animate-fade-in" *ngIf="trendPoints.length > 0 || brandBars.length > 0">
+        <!-- Daily Trend Line/Area Chart -->
+        <div class="chart-card card trend-chart">
+          <div class="chart-header d-flex justify-between align-center">
+            <div class="chart-title-box">
+              <h4><span class="material-icons chart-title-icon">trending_up</span> Registration Trend</h4>
+              <p class="chart-subtitle">Daily registered devices (last 14 days)</p>
+            </div>
+            <div class="chart-summary-number" *ngIf="hoveredPoint">
+              <span class="summary-val">{{ hoveredPoint.count }}</span>
+              <span class="summary-date">{{ hoveredPoint.date }}</span>
+            </div>
+          </div>
           <div class="svg-container">
-            <svg viewBox="0 0 500 200" width="100%" height="100%" preserveAspectRatio="none">
-              <!-- Defs for Gradients -->
+            <svg viewBox="0 0 500 200" preserveAspectRatio="none" class="chart-svg">
+              <line *ngFor="let tick of trendYTicks" x1="40" [attr.y1]="tick.y" x2="490" [attr.y2]="tick.y" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4 4" />
+              <text *ngFor="let tick of trendYTicks" x="32" [attr.y]="tick.y + 4" text-anchor="end" fill="#9ca3af" font-size="10">{{ tick.val }}</text>
+              <path [attr.d]="trendAreaPath" fill="url(#trendGradient)" opacity="0.4" />
+              <path [attr.d]="trendLinePath" fill="none" stroke="#e11d48" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              <g *ngFor="let pt of trendPoints">
+                <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="4" fill="#e11d48" stroke="#111827" stroke-width="2" class="chart-dot" (mouseenter)="hoveredPoint = pt" (mouseleave)="hoveredPoint = null" />
+              </g>
               <defs>
-                <linearGradient id="trendAreaGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.3" />
-                  <stop offset="100%" stop-color="#3B82F6" stop-opacity="0.0" />
-                </linearGradient>
-                <linearGradient id="trendLineGradient" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#3B82F6" />
-                  <stop offset="50%" stop-color="#8B5CF6" />
-                  <stop offset="100%" stop-color="#EC4899" />
+                <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#e11d48" stop-opacity="0.8" />
+                  <stop offset="100%" stop-color="#e11d48" stop-opacity="0.0" />
                 </linearGradient>
               </defs>
-
-              <!-- Gridlines -->
-              <g class="chart-gridlines">
-                <line *ngFor="let tick of trendYTicks" x1="40" [attr.y1]="tick.y" x2="480" [attr.y2]="tick.y"
-                  stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4,4"></line>
-              </g>
-
-              <!-- Area Fill -->
-              <path [attr.d]="trendAreaPath" fill="url(#trendAreaGradient)"></path>
-
-              <!-- Line Path -->
-              <path [attr.d]="trendLinePath" fill="none" stroke="url(#trendLineGradient)" stroke-width="3.5"
-                stroke-linecap="round" stroke-linejoin="round"></path>
-
-              <!-- Hover Guides & Interactive Circles -->
-              <g class="chart-markers">
-                <circle *ngFor="let p of trendPoints" [attr.cx]="p.x" [attr.cy]="p.y" r="4.5"
-                  [attr.fill]="hoveredPoint === p ? '#EC4899' : '#3B82F6'" stroke="#FFFFFF" stroke-width="1.5"
-                  class="chart-dot" [class.active]="hoveredPoint === p">
-                </circle>
-              </g>
-
-              <!-- Invisible hover detection areas (Vertical slivers for easy hover) -->
-              <g class="chart-hover-regions">
-                <rect *ngFor="let p of trendPoints; let idx = index" [attr.x]="p.x - 15" y="20" width="30" height="150"
-                  fill="transparent" style="cursor: pointer;" (mouseenter)="hoveredPoint = p"
-                  (mouseleave)="hoveredPoint = null">
-                </rect>
-              </g>
-
-              <!-- Axes Text Labels -->
-              <!-- Y Axis Counts -->
-              <text *ngFor="let tick of trendYTicks" x="30" [attr.y]="tick.y + 4" class="axis-text text-right"
-                text-anchor="end">{{ tick.val }}</text>
-
-              <!-- X Axis Dates (Skip intermediate labels for clean spacing) -->
-              <g class="x-axis-labels">
-                <ng-container *ngFor="let p of trendPoints; let idx = index">
-                  <text [attr.x]="p.x" y="190" class="axis-text text-center" text-anchor="middle"
-                    *ngIf="idx % 2 === 0 || idx === trendPoints.length - 1">
-                    {{ p.label }}
-                  </text>
-                </ng-container>
-              </g>
             </svg>
           </div>
         </div>
-      </div>
 
-      <!-- Brand Distribution Bar Chart -->
-      <div class="chart-card card brand-chart">
-        <div class="chart-header d-flex justify-between align-center">
-          <div class="chart-title-box">
-            <h4><span class="material-icons chart-title-icon">bar_chart</span> Brand Distribution</h4>
-            <p class="chart-subtitle">Registrations by device mobile brand</p>
+        <!-- Brand Distribution Bar Chart -->
+        <div class="chart-card card brand-chart">
+          <div class="chart-header d-flex justify-between align-center">
+            <div class="chart-title-box">
+              <h4><span class="material-icons chart-title-icon text-blue">smartphone</span> Top Mobile Brands</h4>
+              <p class="chart-subtitle">Distribution by registered device brand</p>
+            </div>
+            <div class="chart-summary-number" *ngIf="hoveredBar">
+              <span class="summary-val text-blue">{{ hoveredBar.count }}</span>
+              <span class="summary-date">{{ hoveredBar.brand }}</span>
+            </div>
           </div>
-          <div class="chart-summary-number" *ngIf="hoveredBar">
-            <span class="trend-date-label">{{ hoveredBar.brand }}</span>
-            <strong class="trend-count-val">{{ hoveredBar.count }} Cases</strong>
-          </div>
-          <div class="chart-summary-number" *ngIf="!hoveredBar && brandBars.length > 0">
-            <span class="trend-date-label">Leading: {{ brandBars[0].brand }}</span>
-            <strong class="trend-count-val">{{ brandBars[0].count }} Cases</strong>
-          </div>
-        </div>
-
-        <div class="chart-body">
           <div class="svg-container">
-            <svg viewBox="0 0 500 200" width="100%" height="100%" preserveAspectRatio="none">
-              <!-- Defs for Bar Gradients -->
+            <svg viewBox="0 0 450 200" preserveAspectRatio="none" class="chart-svg">
+              <line *ngFor="let tick of brandYTicks" x1="30" [attr.y1]="tick.y" x2="440" [attr.y2]="tick.y" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4 4" />
+              <g *ngFor="let bar of brandBars">
+                <rect [attr.x]="bar.x" [attr.y]="bar.y" [attr.width]="bar.width" [attr.height]="bar.height" rx="3" fill="url(#brandGradient)" class="chart-bar" (mouseenter)="hoveredBar = bar" (mouseleave)="hoveredBar = null" />
+                <text [attr.x]="bar.x + bar.width / 2" y="192" text-anchor="middle" fill="#9ca3af" font-size="9" class="bar-label">{{ bar.brand }}</text>
+              </g>
               <defs>
-                <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#10B981" />
-                  <stop offset="100%" stop-color="#059669" />
-                </linearGradient>
-                <linearGradient id="barHoverGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#34D399" />
-                  <stop offset="100%" stop-color="#10B981" />
+                <linearGradient id="brandGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3b82f6" />
+                  <stop offset="100%" stop-color="#1d4ed8" />
                 </linearGradient>
               </defs>
-
-              <!-- Gridlines -->
-              <g class="chart-gridlines">
-                <line *ngFor="let tick of brandYTicks" x1="40" [attr.y1]="tick.y" x2="480" [attr.y2]="tick.y"
-                  stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4,4"></line>
-              </g>
-
-              <!-- Bar Rectangles -->
-              <g class="chart-bars">
-                <rect *ngFor="let bar of brandBars" [attr.x]="bar.x" [attr.y]="bar.y" [attr.width]="bar.width"
-                  [attr.height]="bar.height"
-                  [attr.fill]="hoveredBar === bar ? 'url(#barHoverGradient)' : 'url(#barGradient)'" rx="4" ry="4"
-                  class="chart-bar" (mouseenter)="hoveredBar = bar" (mouseleave)="hoveredBar = null"
-                  style="cursor: pointer; transition: all 0.2s ease;">
-                </rect>
-              </g>
-
-              <!-- Y Axis Counts -->
-              <text *ngFor="let tick of brandYTicks" x="30" [attr.y]="tick.y + 4" class="axis-text text-right"
-                text-anchor="end">{{ tick.val }}</text>
-
-              <!-- X Axis Labels (Brands) -->
-              <g class="x-axis-labels">
-                <text *ngFor="let bar of brandBars" [attr.x]="bar.labelX" y="190"
-                  class="axis-text text-center text-brand-label" text-anchor="middle">
-                  {{ bar.brand }}
-                </text>
-              </g>
             </svg>
           </div>
         </div>
-      </div>
+      </section>
 
-    </section>
-
-    <!-- Filters and Searches Controls -->
-    <section class="controls-section card animate-fade-in">
-      <div class="filters-grid grid gap-3">
-
-        <!-- Search -->
-        <div class="control-group">
-          <label for="search">Search</label>
-          <div class="search-box">
-            <span class="material-icons search-icon">search</span>
-            <input type="text" id="search" [(ngModel)]="search" placeholder="Search Name, Phone, IMEI..."
-              (keyup.enter)="onApplyFilters()">
+      <!-- Registrations Data Table -->
+      <section class="table-section card animate-fade-in">
+        <div class="table-header d-flex justify-between align-center flex-wrap gap-2">
+          <div class="d-flex align-center gap-2">
+            <h3>Registered Devices</h3>
+            <span class="badge-count">{{ totalCount }}</span>
           </div>
-        </div>
 
-        <!-- Brand Filter -->
-        <div class="control-group">
-          <label for="brand">Brand</label>
-          <select id="brand" [(ngModel)]="brandFilter" (change)="onApplyFilters()">
-            <option value="">All Brands</option>
-            <option *ngFor="let brand of brands" [value]="brand">{{ brand }}</option>
-          </select>
-        </div>
-
-        <!-- Status Filter -->
-        <div class="control-group">
-          <label for="status">Status</label>
-          <select id="status" [(ngModel)]="statusFilter" (change)="onApplyFilters()">
-            <option value="">All Statuses</option>
-            <option *ngFor="let stat of statuses" [value]="stat">{{ stat }}</option>
-          </select>
-        </div>
-
-        <!-- Start Date -->
-        <div class="control-group">
-          <label for="startDate">Missing From Date</label>
-          <input type="date" id="startDate" [(ngModel)]="startDate" (change)="onApplyFilters()">
-        </div>
-
-        <!-- End Date -->
-        <div class="control-group">
-          <label for="endDate">Missing To Date</label>
-          <input type="date" id="endDate" [(ngModel)]="endDate" (change)="onApplyFilters()">
-        </div>
-
-      </div>
-
-      <div class="controls-actions d-flex justify-between align-center">
-        <div class="filter-btns d-flex gap-2">
-          <button class="btn btn-primary btn-sm" (click)="onApplyFilters()">
-            <span class="material-icons">filter_alt</span> Apply Filters
-          </button>
-          <button class="btn btn-outline btn-sm" (click)="onClearFilters()">
-            <span class="material-icons">restart_alt</span> Clear Filters
-          </button>
-        </div>
-
-        <div class="export-btns d-flex gap-2">
-          <button class="btn btn-secondary btn-sm" (click)="exportExcel()">
-            <span class="material-icons">table_view</span> Export XLSX
-          </button>
-          <button class="btn btn-secondary btn-sm" (click)="exportCSV()">
-            <span class="material-icons">download</span> Export CSV
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Table Data Grid -->
-    <section class="table-section card animate-fade-in">
-      <div class="table-responsive">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th (click)="onSort('si_no')" [class.sorted]="sortField === 'si_no'">
-                S.No <span class="material-icons sort-arrow">{{ sortField === 'si_no' ? (sortOrder === 'ASC' ?
-                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
-              </th>
-              <th (click)="onSort('si_no')" [class.sorted]="sortField === 'si_no'">
-                Level ID <span class="material-icons sort-arrow">{{ sortField === 'si_no' ? (sortOrder === 'ASC' ?
-                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
-              </th>
-              <th (click)="onSort('name')" [class.sorted]="sortField === 'name'">
-                Name <span class="material-icons sort-arrow">{{ sortField === 'name' ? (sortOrder === 'ASC' ?
-                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
-              </th>
-              <th (click)="onSort('mobile_number')" [class.sorted]="sortField === 'mobile_number'">
-                Mobile <span class="material-icons sort-arrow">{{ sortField === 'mobile_number' ? (sortOrder === 'ASC' ?
-                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
-              </th>
-              <th>Alternative Mobile</th>
-              <th>Instagram ID</th>
-              <th (click)="onSort('imei_1')" [class.sorted]="sortField === 'imei_1'">
-                IMEI 1 <span class="material-icons sort-arrow">{{ sortField === 'imei_1' ? (sortOrder === 'ASC' ?
-                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
-              </th>
-              <th>IMEI 2</th>
-              <th (click)="onSort('mobile_brand')" [class.sorted]="sortField === 'mobile_brand'">
-                Brand <span class="material-icons sort-arrow">{{ sortField === 'mobile_brand' ? (sortOrder === 'ASC' ?
-                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
-              </th>
-              <th (click)="onSort('missing_date')" [class.sorted]="sortField === 'missing_date'">
-                Missing Date <span class="material-icons sort-arrow">{{ sortField === 'missing_date' ? (sortOrder ===
-                  'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
-              </th>
-              <th (click)="onSort('status')" [class.sorted]="sortField === 'status'">
-                Status <span class="material-icons sort-arrow">{{ sortField === 'status' ? (sortOrder === 'ASC' ?
-                  'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
-              </th>
-              <th (click)="onSort('created_at')" [class.sorted]="sortField === 'created_at'">
-                Registered Date <span class="material-icons sort-arrow">{{ sortField === 'created_at' ? (sortOrder ===
-                  'ASC' ? 'arrow_upward' : 'arrow_downward') : 'import_export' }}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let reg of registrations" (click)="openDetails(reg)" class="clickable-row">
-              <td>{{ reg.si_no || '-' }}</td>
-              <td class="font-bold">{{ reg.level_id || '-' }}</td>
-              <td class="font-bold">{{ reg.name }}</td>
-              <td>{{ reg.mobile_number }}</td>
-              <td>{{ reg.alternative_mobile_number || '-' }}</td>
-              <td>
-                <a *ngIf="reg.instagram_id" [href]="'https://instagram.com/' + reg.instagram_id" target="_blank"
-                  class="insta-link">
-                  <span class="material-icons" style="font-size: 14px; vertical-align: middle;">camera_alt</span> {{
-                  reg.instagram_id }}
-                </a>
-                <span *ngIf="!reg.instagram_id">-</span>
-              </td>
-              <td>{{ reg.imei_1 }}</td>
-              <td>{{ reg.imei_2 || '-' }}</td>
-              <td>{{ reg.mobile_brand }}</td>
-              <td>{{ reg.missing_date | date:'yyyy-MM-dd' }}</td>
-              <td>
-                <span class="status-pill" [class]="reg.status.toLowerCase().replace(' ', '-')">
-                  {{ reg.status }}
-                </span>
-              </td>
-              <td>{{ reg.created_at | date:'yyyy-MM-dd HH:mm' }}</td>
-            </tr>
-            <tr *ngIf="registrations.length === 0">
-              <td colspan="12" class="no-records text-center">
-                <span class="material-icons">info_outline</span>
-                <p>No registrations match the query parameters.</p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination node -->
-      <div class="pagination-container d-flex justify-between align-center" *ngIf="totalCount > 0">
-        <div class="pagination-info">
-          Showing {{ (page - 1) * limit + 1 }} to {{ page * limit > totalCount ? totalCount : page * limit }} of {{
-          totalCount }} records
-        </div>
-
-        <div class="pagination-controls d-flex align-center gap-1">
-          <button class="btn-pagination" [disabled]="page === 1" (click)="goToPage(page - 1)">
-            <span class="material-icons">chevron_left</span>
-          </button>
-
-          <ng-container *ngFor="let p of visiblePages">
-            <button *ngIf="p !== '...'; else dots" class="btn-pagination" [class.active]="page === p"
-              (click)="goToPage(p)">
-              {{ p }}
+          <div class="d-flex align-center gap-2 flex-wrap">
+            <button class="btn btn-secondary btn-sm d-flex align-center gap-1" (click)="exportExcel()" title="Download Excel Sheet">
+              <span class="material-icons">file_download</span> Export Excel
             </button>
-            <ng-template #dots>
-              <span class="pagination-dots">...</span>
-            </ng-template>
-          </ng-container>
+            <button class="btn btn-outline btn-sm d-flex align-center gap-1" (click)="exportCSV()" title="Download CSV Sheet">
+              <span class="material-icons">description</span> Export CSV
+            </button>
+          </div>
+        </div>
 
-          <button class="btn-pagination" [disabled]="page === pagesArray.length" (click)="goToPage(page + 1)">
-            <span class="material-icons">chevron_right</span>
+        <!-- Filter Toolbar -->
+        <div class="filter-bar mb-4">
+          <div class="search-input-wrap">
+            <span class="material-icons search-icon">search</span>
+            <input type="text" [(ngModel)]="search" (keyup.enter)="onSearch()" placeholder="Search Name, Mobile, IMEI, Model, Level ID..." class="form-control">
+          </div>
+
+          <select [(ngModel)]="brandFilter" (change)="onSearch()" class="form-select">
+            <option value="">All Brands</option>
+            <option *ngFor="let b of brands" [value]="b">{{ b }}</option>
+          </select>
+
+          <select [(ngModel)]="statusFilter" (change)="onSearch()" class="form-select">
+            <option value="">All Statuses</option>
+            <option *ngFor="let st of statuses" [value]="st">{{ st }}</option>
+          </select>
+
+          <input type="date" [(ngModel)]="startDate" (change)="onSearch()" class="form-control" title="From Missing Date">
+          <input type="date" [(ngModel)]="endDate" (change)="onSearch()" class="form-control" title="To Missing Date">
+
+          <button class="btn-reset" (click)="resetFilters()" title="Reset Filters">
+            <span class="material-icons">restart_alt</span> Reset
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th (click)="toggleSort('si_no')" class="sortable" [class.active-sort]="isSorted('si_no')">
+                  S.No <span class="material-icons sort-icon">{{ getSortIcon('si_no') }}</span>
+                </th>
+                <th (click)="toggleSort('si_no')" class="sortable" [class.active-sort]="isSorted('si_no')">
+                  Level ID <span class="material-icons sort-icon">{{ getSortIcon('si_no') }}</span>
+                </th>
+                <th (click)="toggleSort('name')" class="sortable" [class.active-sort]="isSorted('name')">
+                  Name <span class="material-icons sort-icon">{{ getSortIcon('name') }}</span>
+                </th>
+                <th (click)="toggleSort('mobile_number')" class="sortable" [class.active-sort]="isSorted('mobile_number')">
+                  Mobile <span class="material-icons sort-icon">{{ getSortIcon('mobile_number') }}</span>
+                </th>
+                <th>Alternative Mobile</th>
+                <th>Instagram ID</th>
+                <th (click)="toggleSort('imei_1')" class="sortable" [class.active-sort]="isSorted('imei_1')">
+                  IMEI 1 <span class="material-icons sort-icon">{{ getSortIcon('imei_1') }}</span>
+                </th>
+                <th>IMEI 2</th>
+                <th (click)="toggleSort('mobile_brand')" class="sortable" [class.active-sort]="isSorted('mobile_brand')">
+                  Brand <span class="material-icons sort-icon">{{ getSortIcon('mobile_brand') }}</span>
+                </th>
+                <th (click)="toggleSort('missing_date')" class="sortable" [class.active-sort]="isSorted('missing_date')">
+                  Missing Date <span class="material-icons sort-icon">{{ getSortIcon('missing_date') }}</span>
+                </th>
+                <th (click)="toggleSort('status')" class="sortable" [class.active-sort]="isSorted('status')">
+                  Status <span class="material-icons sort-icon">{{ getSortIcon('status') }}</span>
+                </th>
+                <th (click)="toggleSort('created_at')" class="sortable" [class.active-sort]="isSorted('created_at')">
+                  Registered Date <span class="material-icons sort-icon">{{ getSortIcon('created_at') }}</span>
+                </th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of registrations" (click)="openDetails(item)" class="table-row-hover">
+                <td class="font-mono text-muted text-sm">{{ item.si_no || '-' }}</td>
+                <td><span class="badge-level-id">{{ item.level_id || '-' }}</span></td>
+                <td class="font-bold text-slate-900">{{ item.name }}</td>
+                <td class="font-semibold text-slate-700">{{ item.mobile_number }}</td>
+                <td class="text-slate-600">{{ item.alternative_mobile_number || '-' }}</td>
+                <td>
+                  <a *ngIf="item.instagram_id" [href]="getInstaUrl(item.instagram_id)" target="_blank" class="insta-id-link" (click)="$event.stopPropagation()">
+                    <span class="material-icons insta-icon">photo_camera</span>
+                    <span>{{ getInstaHandle(item.instagram_id) }}</span>
+                  </a>
+                  <span *ngIf="!item.instagram_id" class="text-muted text-xs">-</span>
+                </td>
+                <td class="font-mono text-sm text-slate-700">{{ item.imei_1 }}</td>
+                <td class="font-mono text-sm text-slate-500">{{ item.imei_2 || '-' }}</td>
+                <td class="font-semibold text-slate-800">{{ item.mobile_brand }} <span *ngIf="item.mobile_model" class="text-xs text-muted">({{ item.mobile_model }})</span></td>
+                <td class="text-slate-600">{{ item.missing_date ? (item.missing_date | date:'yyyy-MM-dd') : '-' }}</td>
+                <td><span class="badge-status" [ngClass]="getStatusClass(item.status)">{{ item.status }}</span></td>
+                <td class="text-slate-600">{{ item.created_at | date:'yyyy-MM-dd HH:mm' }}</td>
+                <td class="text-right" (click)="$event.stopPropagation()">
+                  <button class="btn-action-view" (click)="openDetails(item)" title="View Details">
+                    <span class="material-icons">visibility</span>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="registrations.length === 0">
+                <td colspan="13" class="text-center py-5 text-muted">
+                  <span class="material-icons no-data-icon">search_off</span>
+                  <p>No device registration records found.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- VIEW 2: DATABASE BACKUP & DISASTER RECOVERY (EXACT MATCH TO USER SCREENSHOT) -->
+    <div *ngIf="activeTab === 'backups'" class="backup-view-container animate-fade-in">
+      
+      <!-- Top Live Progress Notification Banner (Matches Screenshot Bar) -->
+      <div *ngIf="isOperationInProgress" class="backup-top-banner-alert d-flex align-center justify-between p-3 mb-3 animate-fade-in">
+        <div class="d-flex align-center gap-3">
+          <span class="material-icons info-icon spin-slow">info</span>
+          <span class="banner-text font-semibold">{{ operationTitle }}</span>
+        </div>
+        <div class="d-flex align-center gap-3">
+          <div class="banner-percent-pill font-mono font-bold">{{ operationProgress }}%</div>
+          <button class="btn-close-banner" (click)="stopProgressTracker()" title="Dismiss Progress Banner">
+            <span class="material-icons">close</span>
           </button>
         </div>
       </div>
-    </section>
 
-    <div class="promoter-container" style="margin-top: 2rem; padding-bottom: 2rem;">
-      <span>Developed by</span>
-      <span class="promoter-title">AJR Digital Hub</span>
+      <!-- Top Breadcrumb -->
+      <div class="backup-breadcrumb">
+        <span>SETTINGS</span> &gt; <span>SYSTEM</span> &gt; <span class="active-crumb">DATABASE BACKUPS</span>
+      </div>
+
+      <!-- Header Section -->
+      <div class="backup-main-header d-flex justify-between align-center mb-4">
+        <div>
+          <h1 class="backup-main-title">DATABASE BACKUP & DISASTER RECOVERY</h1>
+          <p class="backup-main-subtitle">Automated snapshot vault, cryptographic verification, and disaster recovery for PostgreSQL.</p>
+        </div>
+        
+        <div class="backup-status-pill-box d-flex align-center gap-2">
+          <div class="status-health-badge" [class.healthy]="backupStats?.systemHealth === 'HEALTHY'">
+            <span class="status-dot"></span>
+            BACKUP SYSTEM {{ backupStats?.systemHealth || 'HEALTHY' }}
+          </div>
+          <button class="btn-refresh-icon" (click)="loadBackups()" title="Refresh Vault" [disabled]="isOperationInProgress">
+            <span class="material-icons" [class.spin-slow]="isOperationInProgress">refresh</span>
+          </button>
+          <button class="btn-refresh-icon" (click)="lockBackupsAccess()" title="Lock Database Vault">
+            <span class="material-icons" style="color: #d97706;">lock</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Buttons Bar -->
+      <div class="backup-toolbar-card d-flex justify-between align-center mb-4 p-3">
+        <div class="d-flex align-center gap-3">
+          <button class="btn-backup-now d-flex align-center gap-2" (click)="triggerBackupNow()" [disabled]="isBackingUp || isOperationInProgress">
+            <span class="material-icons" [class.spin-fast]="isBackingUp">cloud_upload</span> 
+            {{ isBackingUp ? 'BACKING UP...' : 'BACKUP NOW' }}
+          </button>
+          
+          <button class="btn-dark-action d-flex align-center gap-2" (click)="openUploadZipModal()" [disabled]="isUploadingBackup || isOperationInProgress">
+            <span class="material-icons" [class.spin-fast]="isUploadingBackup">upload_file</span> UPLOAD BACKUP ZIP
+          </button>
+          
+          <button class="btn-dark-action d-flex align-center gap-2" (click)="runSystemHealthCheck()" [disabled]="isCheckingHealth || isOperationInProgress">
+            <span class="material-icons" [class.spin-fast]="isCheckingHealth">verified_user</span> SYSTEM HEALTH CHECK
+          </button>
+        </div>
+
+        <div class="firebase-storage-root text-sm font-mono text-muted">
+          Firebase Storage Root: <span class="highlight-root">{{ backupStats?.storageRoot || 'db_backups/' }}</span>
+        </div>
+      </div>
+
+      <!-- Real-Time Progress UI Card -->
+      <div *ngIf="isOperationInProgress" class="backup-progress-card card p-4 mb-4 animate-fade-in">
+        <div class="d-flex justify-between align-center mb-3">
+          <div class="d-flex align-center gap-3">
+            <div class="progress-pulse-ring">
+              <span class="material-icons progress-main-icon spin-fast">sync</span>
+            </div>
+            <div>
+              <div class="d-flex align-center gap-2">
+                <h3 class="progress-card-title m-0">{{ operationTitle }}</h3>
+                <span class="progress-type-badge font-mono text-xs">{{ operationType }} IN PROGRESS</span>
+              </div>
+              <p class="progress-card-subtitle text-muted text-xs mt-1 mb-0">{{ operationDetail }}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="progress-badge-percent font-mono font-bold text-2xl text-primary">
+              {{ operationProgress }}%
+            </div>
+            <div class="text-xs text-muted font-medium mt-1">
+              Stage {{ operationStage }} of {{ operationSteps.length }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Animated Shimmer Progress Bar Track -->
+        <div class="progress-bar-container my-3">
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" [style.width.%]="operationProgress">
+              <div class="progress-bar-shimmer"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4-Stage Workflow Steps Pipeline -->
+        <div class="progress-steps-pipeline d-flex justify-between align-center mt-3 pt-3 border-t">
+          <div *ngFor="let step of operationSteps; let i = index" 
+               class="pipeline-step-item d-flex align-center gap-2"
+               [class.step-completed]="i + 1 < operationStage"
+               [class.step-active]="i + 1 === operationStage"
+               [class.step-pending]="i + 1 > operationStage">
+            <div class="step-badge">
+              <span *ngIf="i + 1 < operationStage" class="material-icons step-icon check-icon">check</span>
+              <span *ngIf="i + 1 === operationStage" class="material-icons step-icon spin-fast">sync</span>
+              <span *ngIf="i + 1 > operationStage" class="step-num font-mono">{{ i + 1 }}</span>
+            </div>
+            <span class="step-label text-xs font-semibold">{{ step }}</span>
+            <span *ngIf="i < operationSteps.length - 1" class="pipeline-connector-line"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 KPI Metric Cards Grid -->
+      <div class="backup-metrics-grid grid gap-3 mb-5">
+        
+        <!-- Card 1: LAST BACKUP -->
+        <div class="backup-metric-card">
+          <div class="metric-header d-flex justify-between align-center">
+            <span class="metric-title">LAST BACKUP</span>
+            <span class="material-icons metric-icon">check_circle</span>
+          </div>
+          <div class="metric-value">
+            {{ backupStats?.lastBackup ? (backupStats.lastBackup.createdAt | date:'MMM dd, HH:mm') : 'None' }}
+          </div>
+          <div class="metric-subtext">
+            {{ backupStats?.lastBackup ? 'SHA-256 Verified' : 'No backups recorded' }}
+          </div>
+        </div>
+
+        <!-- Card 2: NEXT SCHEDULE -->
+        <div class="backup-metric-card">
+          <div class="metric-header d-flex justify-between align-center">
+            <span class="metric-title">NEXT SCHEDULE</span>
+            <span class="material-icons metric-icon text-red">schedule</span>
+          </div>
+          <div class="metric-value">Weekly Once</div>
+          <div class="metric-subtext">Sundays 02:00 AM IST</div>
+        </div>
+
+        <!-- Card 3: TOTAL BACKUPS -->
+        <div class="backup-metric-card">
+          <div class="metric-header d-flex justify-between align-center">
+            <span class="metric-title">TOTAL BACKUPS</span>
+            <span class="material-icons metric-icon">folder_zip</span>
+          </div>
+          <div class="metric-value">{{ backupStats?.totalBackups || 0 }}</div>
+          <div class="metric-subtext">Retention: Keep latest 8</div>
+        </div>
+
+        <!-- Card 4: STORAGE USED -->
+        <div class="backup-metric-card">
+          <div class="metric-header d-flex justify-between align-center">
+            <span class="metric-title">STORAGE USED</span>
+            <span class="material-icons metric-icon">cloud</span>
+          </div>
+          <div class="metric-value">{{ backupStats?.storageUsedFormatted || '0 B' }}</div>
+          <div class="metric-subtext">Compressed ZIP snapshots</div>
+        </div>
+
+        <!-- Card 5: DB TABLES -->
+        <div class="backup-metric-card">
+          <div class="metric-header d-flex justify-between align-center">
+            <span class="metric-title">DB TABLES</span>
+            <span class="material-icons metric-icon text-red">table_chart</span>
+          </div>
+          <div class="metric-value">{{ backupStats?.dbTables || 0 }}</div>
+          <div class="metric-subtext">100% current & future tables</div>
+        </div>
+
+        <!-- Card 6: LAST SIZE -->
+        <div class="backup-metric-card">
+          <div class="metric-header d-flex justify-between align-center">
+            <span class="metric-title">LAST SIZE</span>
+            <span class="material-icons metric-icon">center_focus_strong</span>
+          </div>
+          <div class="metric-value">{{ backupStats?.lastSize || '0 B' }}</div>
+          <div class="metric-subtext">Duration: {{ backupStats?.lastDuration || '-' }}</div>
+        </div>
+
+      </div>
+
+      <!-- History & Vault Table Section -->
+      <div class="backup-vault-card card p-4 mb-4">
+        <div class="vault-top-bar d-flex justify-between align-center mb-4 flex-wrap gap-3">
+          <div>
+            <h3 class="vault-heading d-flex align-center gap-2">
+              <span class="material-icons text-red">history</span> BACKUP HISTORY & VAULT SNAPSHOTS
+            </h3>
+            <p class="vault-subheading">Download, cryptographically verify, or restore PostgreSQL database snapshots from Firebase Storage.</p>
+          </div>
+
+          <div class="vault-filter-controls d-flex align-center gap-3">
+            <!-- Search Bar -->
+            <div class="vault-search-box">
+              <span class="material-icons">search</span>
+              <input type="text" [(ngModel)]="backupSearch" (keyup.enter)="onBackupSearch()" placeholder="Search backups, checksum, author...">
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="vault-filter-pills d-flex align-center">
+              <button [class.active]="backupTypeFilter === 'ALL'" (click)="setBackupTypeFilter('ALL')">ALL</button>
+              <button [class.active]="backupTypeFilter === 'MANUAL'" (click)="setBackupTypeFilter('MANUAL')">MANUAL</button>
+              <button [class.active]="backupTypeFilter === 'SCHEDULED'" (click)="setBackupTypeFilter('SCHEDULED')">SCHEDULED</button>
+              <button [class.active]="backupTypeFilter === 'SAFETY'" (click)="setBackupTypeFilter('SAFETY')">SAFETY</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vault History Table -->
+        <div class="table-responsive">
+          <table class="vault-table">
+            <thead>
+              <tr>
+                <th>BACKUP NAME & DATE</th>
+                <th>TYPE</th>
+                <th>STATUS</th>
+                <th>SIZE</th>
+                <th>TABLES</th>
+                <th>DURATION</th>
+                <th>SHA-256 CHECKSUM</th>
+                <th>CREATED BY</th>
+                <th class="text-right">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of backups">
+                <td>
+                  <div class="font-bold text-slate-800">{{ item.name }}</div>
+                  <div class="text-xs text-muted">{{ item.created_at | date:'yyyy-MM-dd HH:mm:ss' }}</div>
+                </td>
+                <td>
+                  <span class="type-pill" [ngClass]="item.type?.toLowerCase()">{{ item.type }}</span>
+                </td>
+                <td>
+                  <span class="status-pill" [ngClass]="item.status?.toLowerCase()">{{ item.status }}</span>
+                </td>
+                <td class="font-mono text-sm">{{ item.size_formatted }}</td>
+                <td>{{ item.table_count }}</td>
+                <td class="text-muted text-sm">{{ item.duration_formatted }}</td>
+                <td>
+                  <span class="checksum-tag font-mono text-xs" (click)="copyChecksum(item.checksum)" title="Click to copy SHA-256 checksum">
+                    {{ item.checksum ? item.checksum.substring(0, 16) + '...' : '-' }}
+                  </span>
+                </td>
+                <td class="text-sm">{{ item.created_by }}</td>
+                <td class="text-right">
+                  <div class="table-actions-cell d-flex justify-end gap-1">
+                    <button class="btn-vault-action restore" (click)="openRestoreModal(item)" title="Restore Snapshot">
+                      <span class="material-icons">history</span> Restore
+                    </button>
+                    <button class="btn-vault-action download" (click)="downloadBackupFile(item)" title="Download ZIP">
+                      <span class="material-icons">download</span>
+                    </button>
+                    <button class="btn-vault-action delete" (click)="confirmDeleteBackup(item)" title="Delete">
+                      <span class="material-icons">delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Empty State -->
+          <div class="empty-vault-box text-center py-5" *ngIf="backups.length === 0">
+            <span class="material-icons empty-vault-icon">cloud_off</span>
+            <h4>NO DATABASE BACKUP RECORDS FOUND</h4>
+            <p class="text-muted">Click "Backup Now" to take the first complete system snapshot.</p>
+          </div>
+        </div>
+
+      </div>
+
     </div>
 
   </div>
 </main>
 
-<!-- Details Modal Drawer -->
-<div class="drawer-overlay" [class.show]="showDetailsDrawer" (click)="closeDetails()">
-  <div class="details-drawer" [class.show]="showDetailsDrawer" (click)="$event.stopPropagation()">
-    <div class="drawer-header d-flex justify-between align-center">
-      <h3>Case Registration Details</h3>
-      <button class="btn-close" (click)="closeDetails()"><span class="material-icons">close</span></button>
+<!-- RESTORE CONFIRMATION MODAL -->
+<div class="modal-overlay" [class.show]="showRestoreConfirmModal" (click)="closeRestoreModal()">
+  <div class="modal-card modal-danger" [class.show]="showRestoreConfirmModal" (click)="$event.stopPropagation()">
+    <div class="modal-header d-flex justify-between align-center">
+      <h3 class="d-flex align-center gap-2 text-red">
+        <span class="material-icons">warning</span> Restore Database Snapshot
+      </h3>
+      <button class="btn-close" (click)="closeRestoreModal()">&times;</button>
     </div>
-
-    <div class="drawer-body" *ngIf="selectedRegistration">
-
-      <!-- Status Modifier -->
-      <div class="detail-section status-modifier-section bg-grey card">
-        <label for="updateStatusField">Update Recovery Case Status</label>
-        <select id="updateStatusField" [value]="selectedRegistration.status"
-          (change)="onUpdateStatus(statusSelect.value)" #statusSelect>
-          <option *ngFor="let stat of statuses" [value]="stat">{{ stat }}</option>
-        </select>
-      </div>
-
-      <!-- Personal Info -->
-      <div class="detail-section">
-        <h4><span class="material-icons detail-sec-icon">person</span> Owner Personal Information</h4>
-        <table class="detail-table">
-          <tr>
-            <th>S.No</th>
-            <td class="font-bold">{{ selectedRegistration.si_no || '-' }}</td>
-          </tr>
-          <tr>
-            <th>Level ID</th>
-            <td class="font-bold text-blue">{{ selectedRegistration.level_id || '-' }}</td>
-          </tr>
-          <tr>
-            <th>Name</th>
-            <td>{{ selectedRegistration.name }}</td>
-          </tr>
-          <tr>
-            <th>Primary Phone</th>
-            <td>{{ selectedRegistration.mobile_number }}</td>
-          </tr>
-          <tr>
-            <th>Alternate Phone</th>
-            <td>{{ selectedRegistration.alternative_mobile_number || 'N/A' }}</td>
-          </tr>
-          <tr>
-            <th>Email Address</th>
-            <td>{{ selectedRegistration.email || 'N/A' }}</td>
-          </tr>
-          <tr>
-            <th>Instagram ID</th>
-            <td>
-              <a *ngIf="selectedRegistration.instagram_id"
-                [href]="'https://instagram.com/' + selectedRegistration.instagram_id" target="_blank"
-                class="insta-link">
-                <span class="material-icons" style="font-size: 16px; vertical-align: middle;">camera_alt</span> {{ '@' +
-                selectedRegistration.instagram_id }}
-              </a>
-              <span *ngIf="!selectedRegistration.instagram_id">N/A</span>
-            </td>
-          </tr>
-        </table>
-      </div>
-
-      <!-- Device Specs -->
-      <div class="detail-section">
-        <h4><span class="material-icons detail-sec-icon">phone_android</span> Mobile Device Specifications</h4>
-        <table class="detail-table">
-          <tr>
-            <th>IMEI Number 1</th>
-            <td>{{ selectedRegistration.imei_1 }}</td>
-          </tr>
-          <tr>
-            <th>IMEI Number 2</th>
-            <td>{{ selectedRegistration.imei_2 || 'N/A' }}</td>
-          </tr>
-          <tr>
-            <th>Mobile Brand</th>
-            <td>{{ selectedRegistration.mobile_brand }}</td>
-          </tr>
-          <tr>
-            <th>Missing Date</th>
-            <td>{{ selectedRegistration.missing_date | date:'yyyy-MM-dd' }}</td>
-          </tr>
-        </table>
-      </div>
-
-      <!-- Incident Copy -->
-      <div class="detail-section" *ngIf="selectedRegistration.incident_description">
-        <h4><span class="material-icons detail-sec-icon">description</span> Incident Description</h4>
-        <p class="description-block">{{ selectedRegistration.incident_description }}</p>
-      </div>
-
-      <!-- Documents Uploaded -->
-      <div class="detail-section documents-section">
-        <h4><span class="material-icons detail-sec-icon">attachment</span> Uploaded Verification Proofs</h4>
-        <div class="doc-links grid gap-2">
-
-          <!-- Invoice File -->
-          <div class="doc-card d-flex justify-between align-center" *ngIf="selectedRegistration.invoice_file">
-            <div class="d-flex align-center gap-2">
-              <span class="material-icons doc-icon">receipt_long</span>
-              <div>
-                <h5>Mobile Purchase Invoice</h5>
-                <p>Verify phone ownership proof</p>
-              </div>
-            </div>
-            <a [href]="'/uploads/' + selectedRegistration.invoice_file" target="_blank"
-              class="btn btn-secondary btn-sm">
-              <span class="material-icons">visibility</span> View File
-            </a>
-          </div>
-
-          <!-- Photo File -->
-          <div class="doc-card d-flex justify-between align-center" *ngIf="selectedRegistration.mobile_photo">
-            <div class="d-flex align-center gap-2">
-              <span class="material-icons doc-icon text-blue">add_a_photo</span>
-              <div>
-                <h5>Device Photo</h5>
-                <p>Reference photo of the mobile</p>
-              </div>
-            </div>
-            <a [href]="'/uploads/' + selectedRegistration.mobile_photo" target="_blank"
-              class="btn btn-secondary btn-sm">
-              <span class="material-icons">visibility</span> View File
-            </a>
-          </div>
-
-          <!-- FIR copy File -->
-          <div class="doc-card d-flex justify-between align-center" *ngIf="selectedRegistration.fir_file">
-            <div class="d-flex align-center gap-2">
-              <span class="material-icons doc-icon text-red">description</span>
-              <div>
-                <h5>FIR / Complaint Copy</h5>
-                <p>Official police registry copy</p>
-              </div>
-            </div>
-            <a [href]="'/uploads/' + selectedRegistration.fir_file" target="_blank" class="btn btn-secondary btn-sm">
-              <span class="material-icons">visibility</span> View File
-            </a>
-          </div>
-
+    <div class="modal-body p-4">
+      <p class="mb-3 font-semibold text-slate-800">You are about to restore PostgreSQL database to snapshot:</p>
+      
+      <div class="snapshot-highlight p-3 mb-3 rounded border">
+        <div><strong>File:</strong> {{ selectedBackupForRestore?.name }}</div>
+        <div><strong>Created:</strong> {{ selectedBackupForRestore?.created_at | date:'yyyy-MM-dd HH:mm:ss' }}</div>
+        <div class="mt-1">
+          <strong>Checksum:</strong>
+          <div class="checksum-value">{{ selectedBackupForRestore?.checksum }}</div>
         </div>
       </div>
 
+      <div class="alert-safety-box p-3 rounded mb-3">
+        <span class="material-icons text-amber">shield</span>
+        <span>An automatic <strong>SAFETY snapshot</strong> of current data will be generated before restoring.</span>
+      </div>
+
+      <!-- Password Security Input -->
+      <div class="security-password-box p-3 rounded border mb-3">
+        <label for="restorePassword" class="form-label font-bold text-slate-900 d-block mb-1">
+          <span class="material-icons text-red text-sm align-middle">lock</span> Security Password Required:
+        </label>
+        <input type="password" id="restorePassword" [(ngModel)]="restoreConfirmPassword" (keyup.enter)="confirmRestoreBackup()" placeholder="Enter security password (e.g. Mec170761$)" class="form-control mb-1">
+        <p class="text-xs text-muted m-0">Enter admin security password to authorize disaster database restoration.</p>
+        <div *ngIf="restoreErrorMsg" class="text-xs text-red font-bold mt-2">{{ restoreErrorMsg }}</div>
+      </div>
+
+      <p class="text-xs text-muted m-0">This will update all tables with rows stored in this snapshot package. Are you sure you wish to proceed?</p>
+    </div>
+
+    <div class="modal-footer d-flex justify-end gap-2 p-3">
+      <button class="btn btn-outline btn-sm" (click)="closeRestoreModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm d-flex align-center gap-1" (click)="confirmRestoreBackup()" [disabled]="isRestoring || !restoreConfirmPassword">
+        <span class="material-icons">restore</span> {{ isRestoring ? 'Restoring...' : 'Confirm Disaster Restore' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- UPLOAD BACKUP ZIP MODAL -->
+<div class="modal-overlay" [class.show]="showUploadZipModal" (click)="closeUploadZipModal()">
+  <div class="modal-card" [class.show]="showUploadZipModal" (click)="$event.stopPropagation()">
+    <div class="modal-header d-flex justify-between align-center">
+      <h3 class="d-flex align-center gap-2">
+        <span class="material-icons text-blue">upload_file</span> Upload Backup ZIP Package
+      </h3>
+      <button class="btn-close" (click)="closeUploadZipModal()">&times;</button>
+    </div>
+    <div class="modal-body p-4">
+      <p class="mb-3 text-sm text-muted">Select a valid `.ZIP` snapshot file containing `dump.json` or `backup.sql` to catalog into Firebase Storage vault (`db_backups/`).</p>
+      
+      <div class="file-upload-dropzone p-4 text-center border-dashed rounded mb-3" (click)="zipFileInput.click()">
+        <span class="material-icons upload-icon text-muted">cloud_upload</span>
+        <p class="font-semibold mt-2">{{ selectedZipFile ? selectedZipFile.name : 'Click or Drag ZIP file here' }}</p>
+        <span class="text-xs text-muted" *ngIf="selectedZipFile">Size: {{ (selectedZipFile.size / 1024).toFixed(1) }} KB</span>
+        <input type="file" #zipFileInput (change)="onFileSelected($event)" accept=".zip" class="d-none">
+      </div>
+    </div>
+    <div class="modal-footer d-flex justify-end gap-2 p-3">
+      <button class="btn btn-outline btn-sm" (click)="closeUploadZipModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm d-flex align-center gap-1" (click)="submitUploadBackupZip()" [disabled]="!selectedZipFile || isUploadingBackup">
+        <span class="material-icons">cloud_upload</span> {{ isUploadingBackup ? 'Uploading...' : 'Upload & Catalog Snapshot' }}
+      </button>
     </div>
   </div>
 </div>
@@ -587,8 +661,7 @@
           <input type="text" id="instaUsername" [(ngModel)]="newInstagramUsername"
             placeholder="Enter public username (e.g. godofmobiles)">
         </div>
-        <p class="helper-text">This username dictates the profile links and mockup items loaded on the website landing
-          page.</p>
+        <p class="helper-text">This username dictates the profile links and mockup items loaded on the website landing page.</p>
       </div>
     </div>
 
@@ -596,6 +669,44 @@
       <button class="btn btn-outline btn-sm" (click)="closeSettings()">Cancel</button>
       <button class="btn btn-primary btn-sm" (click)="saveSettings()" [disabled]="isSavingSettings">
         {{ isSavingSettings ? 'Saving...' : 'Save Settings' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- DATABASE BACKUPS SECURITY AUTHORIZATION MODAL -->
+<div class="modal-overlay" [class.show]="showBackupsAuthModal" (click)="closeBackupsAuthModal()">
+  <div class="modal-card" [class.show]="showBackupsAuthModal" (click)="$event.stopPropagation()">
+    <div class="modal-header d-flex justify-between align-center">
+      <h3 class="d-flex align-center gap-2">
+        <span class="material-icons text-red" style="color: #dc2626;">security</span> Database Vault Security Verification
+      </h3>
+      <button class="btn-close" (click)="closeBackupsAuthModal()">&times;</button>
+    </div>
+    <div class="modal-body p-4">
+      <p class="mb-3 text-sm text-muted">Restricted System Area. Please enter the security password to access Database Backup & Disaster Recovery vault.</p>
+      
+      <div class="form-group mb-3">
+        <label for="backupsAuthPasswordInput" class="form-label font-bold text-slate-900 d-block mb-1">
+          <span class="material-icons text-sm align-middle text-red" style="color: #dc2626;">lock</span> Security Password Required / கடவுச்சொல்:
+        </label>
+        <input type="password" 
+               id="backupsAuthPasswordInput" 
+               [(ngModel)]="backupsAuthPassword" 
+               (keyup.enter)="verifyBackupsPassword()" 
+               placeholder="Enter security password" 
+               class="form-control mb-1"
+               autofocus>
+        <p class="text-xs text-muted m-0">Enter the static security credential to unlock database disaster recovery access.</p>
+        <div *ngIf="backupsAuthErrorMsg" class="text-xs text-red font-bold mt-2 d-flex align-center gap-1" style="color: #dc2626;">
+          <span class="material-icons text-xs">error</span> {{ backupsAuthErrorMsg }}
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer d-flex justify-end gap-2 p-3">
+      <button class="btn btn-outline btn-sm" (click)="closeBackupsAuthModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm d-flex align-center gap-1" (click)="verifyBackupsPassword()" [disabled]="!backupsAuthPassword">
+        <span class="material-icons">verified_user</span> Unlock Vault
       </button>
     </div>
   </div>

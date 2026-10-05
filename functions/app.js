@@ -69,10 +69,10 @@ app.use((req, res, next) => {
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error('[Error Handler]', err);
-
+  
   const status = err.status || 500;
   const message = err.message || 'Internal server error / சேவையக பிழை';
-
+  
   res.status(status).json({
     success: false,
     message: message

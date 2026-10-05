@@ -44,6 +44,23 @@ CREATE TABLE IF NOT EXISTS app_settings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Database Backups & Vault History
+CREATE TABLE IF NOT EXISTS database_backups (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    storage_path VARCHAR(500) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'COMPLETED',
+    size_bytes BIGINT DEFAULT 0,
+    size_formatted VARCHAR(50),
+    table_count INT DEFAULT 0,
+    duration_ms INT DEFAULT 0,
+    duration_formatted VARCHAR(50),
+    checksum VARCHAR(128),
+    created_by VARCHAR(150) DEFAULT 'System Cron',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for performance and quick searching
 CREATE INDEX IF NOT EXISTS idx_registrations_mobile_number ON mobile_registrations(mobile_number);
 CREATE INDEX IF NOT EXISTS idx_registrations_imei_1 ON mobile_registrations(imei_1);

@@ -793,5 +793,203 @@ button {
   100% { top: 0; }
 }
 
+/* ==========================================================================
+   AJRMART.com Gift Store Card (Sparkling Golden Animations)
+   ========================================================================== */
+.p-ajrmart-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.98) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.25rem;
+  margin-top: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(245, 158, 11, 0.12);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.p-ajrmart-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 60%);
+  animation: gold-pulse-radial 4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes gold-pulse-radial {
+  0% { transform: scale(0.8) translate(-5%, -5%); opacity: 0.3; }
+  100% { transform: scale(1.15) translate(5%, 5%); opacity: 0.7; }
+}
+
+.p-ajrmart-card:hover {
+  border-color: rgba(251, 191, 36, 0.7);
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.25), 0 0 20px rgba(251, 191, 36, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Floating Sparkling Particles */
+.p-sparkle {
+  position: absolute;
+  pointer-events: none;
+  font-size: 0.75rem;
+  color: #fbbf24;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.9);
+  z-index: 5;
+}
+.p-sparkle-1 {
+  top: 10px;
+  left: 14px;
+  animation: sparkle-twinkle 1.8s infinite ease-in-out 0s;
+}
+.p-sparkle-2 {
+  top: 12px;
+  right: 110px;
+  font-size: 0.85rem;
+  animation: sparkle-twinkle 2.2s infinite ease-in-out 0.6s;
+}
+.p-sparkle-3 {
+  bottom: 12px;
+  right: 18px;
+  animation: sparkle-twinkle 2s infinite ease-in-out 1.1s;
+}
+.p-sparkle-4 {
+  bottom: 10px;
+  left: 42%;
+  font-size: 0.7rem;
+  animation: sparkle-twinkle 2.5s infinite ease-in-out 0.3s;
+}
+
+@keyframes sparkle-twinkle {
+  0% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.35) rotate(45deg); }
+  100% { opacity: 0; transform: scale(0.3) rotate(90deg); }
+}
+
+/* Golden Badge Glow Pulse */
+.p-ajrmart-badge {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  color: #0f172a;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+  animation: badge-glow-pulse 2s infinite ease-in-out;
+  z-index: 2;
+}
+
+@keyframes badge-glow-pulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(245, 158, 11, 0.4); transform: scale(1); }
+  50% { box-shadow: 0 0 16px rgba(251, 191, 36, 0.9); transform: scale(1.04); }
+}
+
+.p-ajrmart-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Gift Icon Bounce & Sparkle Glow */
+.p-gift-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.p-ajrmart-icon {
+  color: #fbbf24;
+  font-size: 1.4rem;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.8));
+  animation: gift-bounce-sparkle 2.5s infinite ease-in-out;
+}
+
+@keyframes gift-bounce-sparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.8)); }
+  50% { transform: scale(1.2) rotate(-8deg); filter: drop-shadow(0 0 14px rgba(251, 191, 36, 1)); }
+}
+
+.p-ajrmart-header h5 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0;
+}
+
+.p-ajrmart-header h5 strong {
+  color: #fbbf24;
+  font-weight: 800;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+}
+
+.p-ajrmart-card p {
+  color: #94a3b8;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin-bottom: 0.85rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Button Shimmer & Hover Glow */
+.p-btn-ajrmart {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+  color: #0f172a !important;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 3px 12px rgba(245, 158, 11, 0.35);
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.p-btn-ajrmart:hover {
+  background: linear-gradient(135deg, #fef08a 0%, #fbbf24 100%);
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.55);
+  transform: translateX(2px);
+}
+
+.p-btn-ajrmart .arrow-icon {
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.p-btn-ajrmart:hover .arrow-icon {
+  transform: translateX(3px);
+}
+
+.btn-shimmer-sweep {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: button-shimmer 2.5s infinite linear;
+}
+
+@keyframes button-shimmer {
+  0% { left: -100%; }
+  35%, 100% { left: 100%; }
+}
+
 
 

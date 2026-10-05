@@ -16,6 +16,7 @@ const createRegistration = async (req, res) => {
       missing_location,
       police_complaint_no,
       incident_description,
+      instagram_id,
     } = req.body;
 
     // Multer uploads files grouped by fields
@@ -30,8 +31,9 @@ const createRegistration = async (req, res) => {
         id, name, mobile_number, alternative_mobile_number, email, 
         imei_1, imei_2, mobile_brand, mobile_model, missing_date, 
         missing_location, police_complaint_no, incident_description, 
+        instagram_id, 
         invoice_file, mobile_photo, fir_file, status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, 'New')
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, 'New')
       RETURNING *
     `;
 
@@ -44,11 +46,12 @@ const createRegistration = async (req, res) => {
       imei_1,
       imei_2 || null,
       mobile_brand,
-      mobile_model,
+      mobile_model || null,
       missing_date,
-      missing_location,
+      missing_location || null,
       police_complaint_no || null,
       incident_description || null,
+      instagram_id || null,
       invoice_file,
       mobile_photo || null,
       fir_file || null
